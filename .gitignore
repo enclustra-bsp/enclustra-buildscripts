@@ -1,0 +1,10 @@
+*.swp
+*.swo
+*.pyc
+bin
+__pycache__
+*_output
+out_*
+sources
+binaries
+*.log
