@@ -80,6 +80,10 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='option_number',
                     help='Set device option. If unset default will be used')
 
+parser.add_argument("-v", "--version", action='store_true', required=False,
+                    dest='version',
+                    help='Print version')
+
 # process main config
 config = configparser.ConfigParser()
 if config.read("enclustra.ini") is None:
@@ -112,10 +116,22 @@ except Exception as ext:
                         str(ext))
     sys.exit(1)
 
+
+revision = utils.get_git_revision().rstrip('\n')
+tool_version = "Enclustra Build Environment (v0.0-" + revision + " (alpha))\n"+ \
+                "Running under Python version " \
+              + str(sys.version.split()[0]) + "." \
+              + "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
+              "\nAll rights reserved."
+
 args = parser.parse_args()
 
+if args.version is True:
+    print(str("\n" + tool_version + "\n"))
+    sys.exit(0)
+
 # if we're in console mode
-if args.device is not None:
+elif args.device is not None:
     # initialize target
     dev_path = root_path + "/targets/" + args.device
     parse_dir = root_path + "/targets"
@@ -237,13 +253,7 @@ if sp != 0:
     sys.exit(1)
 
 # welcome msg
-
-revision = utils.get_git_revision().rstrip('\n')
-welcome_msg = "Enclustra Build Environment (v0.0-" + revision + " (alpha))\n" \
-                "Running under Python version " \
-              + str(sys.version.split()[0]) + "." \
-              + "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
-              "\nAll rights reserved."
+welcome_msg = tool_version;
 # if log file is set this will be logged
 utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
