@@ -92,7 +92,7 @@ class Gui:
         try:
             description, choices = self.get_choices()
         except:
-            self.dialog.msgbox("Error while searching for available choices")
+            self.dialog.msgbox("Error while searching for available choices!")
             return "exit"
         code, tag = self.dialog.menu(description, choices=choices)
         if code == self.dialog.OK:
@@ -123,34 +123,34 @@ class Gui:
 
     def show_fetch_menu(self, menu_items):
         if len(menu_items) != 0:
-            return self.dialog.checklist("Which targets do you want to fetch",
+            return self.dialog.checklist("Which targets do you want to fetch?",
                                          choices=menu_items, extra_button=True,
                                          extra_label="Advanced",
                                          item_help=True)
         else:
-            return self.dialog.yesno("No target marked to fetch found",
+            return self.dialog.yesno("No target marked to fetch found!",
                                      yes_label="OK", no_label="Cancel"), []
 
     def show_binaries_menu(self, menu_items):
         if len(menu_items) != 0:
-            return self.dialog.radiolist("Choose device option",
+            return self.dialog.radiolist("Choose the device option.",
                                          choices=menu_items)
         else:
-            return self.dialog.yesno("No device options found",
+            return self.dialog.yesno("No device options found!",
                                      yes_label="OK", no_label="Cancel"), []
 
     def show_fetch_opts_menu(self, menu_items):
         if len(menu_items) != 0:
-            return self.dialog.checklist("Fetch target with history?",
+            return self.dialog.checklist("Fetch targets with history?",
                                          choices=menu_items)
         else:
-            return self.dialog.yesno("No target marked to fetch found",
+            return self.dialog.yesno("No target marked to fetch found!",
                                      yes_label="OK", no_label="Cancel"), []
 
     def show_build_menu(self, menu_items):
         if len(menu_items) != 0:
-            return self.dialog.checklist("Which target do you want to build?",
+            return self.dialog.checklist("Which targets do you want to build?",
                                          choices=menu_items, item_help=True)
         else:
-            return self.dialog.yesno("No target marked to build found",
+            return self.dialog.yesno("No target marked to build found!",
                                      yes_label="OK", no_label="Cancel"), []

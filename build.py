@@ -87,7 +87,7 @@ parser.add_argument("-v", "--version", action='store_true', required=False,
 # process main config
 config = configparser.ConfigParser()
 if config.read("enclustra.ini") is None:
-    utils.print_message(utils.logtype.ERROR, "Configuration file not found")
+    utils.print_message(utils.logtype.ERROR, "Configuration file not found!")
     sys.exit(1)
 try:
     manifest_repo = config['general']['manifest_repository']
@@ -112,7 +112,7 @@ try:
         utils.register_toolchain(registered_toolchains, toolchain, config,
                                  (config['toolchains'][toolchain] == "remote"))
 except Exception as ext:
-    utils.print_message(utils.logtype.ERROR, "Configuration file corrupted",
+    utils.print_message(utils.logtype.ERROR, "Configuration file corrupted!",
                         str(ext))
     sys.exit(1)
 
@@ -210,7 +210,7 @@ else:
 for tool in required_tools:
     if utils.check_tool(tool[0], tool[1], tool[2], tool[3]) is False:
         utils.print_message(utils.logtype.ERROR, "Version of", tool[0],
-                            "has to be", tool[3], "or greater")
+                            "has to be", tool[3], "or greater!")
         sys.exit(1)
 
 # Git before version 1.8.4 didn't support submodule shallow clone
@@ -222,7 +222,7 @@ git_use_remote = utils.check_tool("git", "--version", 3, "1.8.1.6")
 try:
     utils.mkdir_p(root_path + "/bin")
 except Exception as ex:
-    utils.print_message(utils.logtype.ERROR, "Unable to create 'bin' folder",
+    utils.print_message(utils.logtype.ERROR, "Unable to create 'bin' folder!",
                         ex)
     sys.exit(1)
 
@@ -249,7 +249,7 @@ else:
     sp = utils.call_tool(call)
 if sp != 0:
     utils.print_message(utils.logtype.ERROR,
-                        "Fetching master repository failed")
+                        "Fetching master repository failed!")
     sys.exit(1)
 
 # welcome msg
