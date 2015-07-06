@@ -46,43 +46,43 @@ utils = utils.Utils()
 parser = argparse.ArgumentParser(description="Enclustra's buildsystem")
 parser.add_argument("-d", "--device", action='store', required=False,
                     dest='device', metavar='device',
-                    help='Device ini file location')
+                    help='device ini file location')
 
 parser.add_argument("--disable-fetch", action='append', required=False,
                     dest='disable_fetch', metavar='target',
-                    help='Exclude specific target from fetching')
+                    help='exclude specific target from fetching')
 
 parser.add_argument("--fetch-history", action='append', required=False,
                     dest='fetch_history', metavar='target',
-                    help='Fetch specific target with history')
+                    help='fetch specific target with history')
 
 parser.add_argument("--disable-build", action='append', required=False,
                     dest='disable_build', metavar='target',
-                    help='Exclude specific target from building')
+                    help='exclude specific target from building')
 
 parser.add_argument("-t", "--target", action='append', required=False,
                     dest='target', metavar='target',
-                    help='Fetch and build on the chosen target')
+                    help='fetch and build on the chosen target')
 
 parser.add_argument("-l", "--list", action='store_true', required=False,
                     dest='list_targets',
-                    help='List default targets for chosen device')
+                    help='list default targets for chosen device')
 
 parser.add_argument("-L", "--list-all", action='store_true', required=False,
                     dest='list_targets_all',
-                    help='List all available targets for chosen device')
+                    help='list all available targets for chosen device')
 
 parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
-                    help='List all available device options for chosen device')
+                    help='list all available device options for chosen device')
 
 parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='option_number',
-                    help='Set device option. If unset default will be used')
+                    help='set device option. If unset default will be used')
 
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
-                    help='Print version')
+                    help='print version')
 
 # process main config
 config = configparser.ConfigParser()
