@@ -46,7 +46,10 @@ utils = utils.Utils()
 parser = argparse.ArgumentParser(description="Enclustra's buildsystem")
 parser.add_argument("-d", "--device", action='store', required=False,
                     dest='device', metavar='device',
-                    help='device ini file location')
+                    help='specify this option to run the buildsystem in the '
+                         'command line mode. The device has to be specified '
+                         'in the following way: \n'
+                         '<vendor>/<module>/<base_board>/<boot_device>')
 
 parser.add_argument("--disable-fetch", action='append', required=False,
                     dest='disable_fetch', metavar='target',
