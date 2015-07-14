@@ -137,6 +137,10 @@ elif args.device is not None:
     ini_files = list()
     for directory in (str(args.device)).split("/"):
         parse_dir += "/" + directory
+        if not os.path.exists(parse_dir):
+            utils.print_message(utils.logtype.ERROR, "device argument "
+                                "not supported: " + str(directory))
+            sys.exit(1)
         if os.path.isfile(parse_dir + "/build.ini"):
             ini_files.append(parse_dir + "/build.ini")
 
