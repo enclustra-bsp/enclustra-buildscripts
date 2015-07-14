@@ -141,7 +141,7 @@ elif args.device is not None:
         if os.path.isfile(parse_dir + "/build.ini"):
             ini_files.append(parse_dir + "/build.ini")
 
-    device_name = (str(args.device)).replace("/", "_")
+    device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
     t = target.Target(master_repo_path, dev_path, ini_files,
                       device_name, debug_calls, utils)
     # if list only
