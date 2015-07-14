@@ -107,7 +107,7 @@ class Gui:
 
     def get_target_name(self):
         target_rel_path = os.path.relpath(self.workdir, self.basedir)
-        target_name = target_rel_path.replace("/", "_")
+        target_name = target_rel_path.replace("/", "_").replace(" ","_")
         return target_name
 
     def check_bottom_level(self):
