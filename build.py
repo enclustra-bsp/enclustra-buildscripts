@@ -64,13 +64,9 @@ parser.add_argument("-t", "--target", action='append', required=False,
                     dest='target', metavar='target',
                     help='fetch and build on the chosen target')
 
-parser.add_argument("-l", "--list", action='store_true', required=False,
+parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
-                    help='list default targets for chosen device')
-
-parser.add_argument("-L", "--list-all", action='store_true', required=False,
-                    dest='list_targets_all',
-                    help='list all available targets for chosen device')
+                    help='list all targets for chosen device')
 
 parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
@@ -146,14 +142,6 @@ elif args.device is not None:
                       device_name, debug_calls, utils)
     # if list only
     if args.list_targets is True:
-        targets_list = t.get_fetch()
-        print(str("Default targets for " + args.device + ":"))
-        for tgt in targets_list:
-            if tgt[2] is True:
-                print(str(tgt[0]))
-        sys.exit(0)
-
-    if args.list_targets_all is True:
         targets_list = t.get_fetch()
         print(str("Available targets for " + args.device + ":"))
         for tgt in targets_list:
