@@ -21,6 +21,7 @@ class Target:
     def __init__(self, master_repo_path, config_path, ini_files, target_name,
                  debug_calls, utils):
         self.config = configparser.ConfigParser()
+        self.config.optionxform = str
         self.master_repo_path = master_repo_path
         self.config_path = config_path
         self.config.read(ini_files)
