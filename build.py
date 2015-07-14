@@ -144,7 +144,10 @@ elif args.device is not None:
     if args.list_targets is True:
         targets_list = t.get_fetch()
         print(str("Available targets for " + args.device + ":"))
+        print(str("Default targets are marked with an (*)"))
         for tgt in targets_list:
+                if tgt[2] is True:
+                    tgt[0] = tgt[0] + " (*)"
                 print(str(tgt[0]))
         sys.exit(0)
 
