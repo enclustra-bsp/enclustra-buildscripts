@@ -51,6 +51,10 @@ parser.add_argument("-d", "--device", action='store', required=False,
                          'in the following way: \n'
                          '<vendor>/<module>/<base_board>/<boot_device>')
 
+parser.add_argument("-L", "--list-devices", action='store_true',
+                    required=False, dest='list_devices',
+                    help='list all available devices')
+
 parser.add_argument("--disable-fetch", action='append', required=False,
                     dest='disable_fetch', metavar='target',
                     help='exclude specific target from fetching')
@@ -200,6 +204,9 @@ elif args.device is not None:
                 break
 
     state = "DO_FETCH"
+elif args.list_devices is True:
+    utils.list_devices()
+    sys.exit(0)
 elif len(sys.argv) > 1:
     print(str("Specify the device to use the following arguments: " +
               " ".join(sys.argv[1:])))

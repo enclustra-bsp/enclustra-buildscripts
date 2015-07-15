@@ -190,6 +190,15 @@ class Utils:
         minimal = self.splittedname(minimal_version)
         return local >= minimal
 
+    def list_devices(self):
+        print(str("List of available devices:"))
+        for root, dirs, files in os.walk("targets"):
+            if root == "targets":
+                continue
+            level = root.replace("targets/", '').count(os.sep)
+            indent = ' ' * 3 * (level)
+            print(' {}* {}'.format(indent, os.path.basename(root)))
+
     class cd:
         """Context manager for changing the current working directory"""
         def __init__(self, newPath):
