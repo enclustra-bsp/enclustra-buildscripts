@@ -200,6 +200,10 @@ elif args.device is not None:
                 break
 
     state = "DO_FETCH"
+elif len(sys.argv) > 1:
+    print(str("Specify the device to use the following arguments: " +
+              " ".join(sys.argv[1:])))
+    sys.exit(1)
 else:
     # if we're in gui mode add dialog to tools list
     required_tools += (["dialog", "--version", 2, "1.1-20120215"], )
