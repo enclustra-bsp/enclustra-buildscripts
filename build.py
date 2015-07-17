@@ -42,6 +42,9 @@ required_tools = (["make",   "--version", 3, "3.79.1"],
 
 utils = utils.Utils()
 
+# setup sigint handler
+utils.init_sigint_handler()
+
 # setup argument parser
 parser = argparse.ArgumentParser(description="Enclustra's buildsystem")
 parser.add_argument("-d", "--device", action='store', required=False,
@@ -342,6 +345,8 @@ while done is False:
         state = "DO_BUILD"
 
     elif state == "DO_BUILD":
+        # deinit sigint handler
+        utils.deinit_sigint_handler()
         required_toolchains = t.get_required_toolchains()
         try:
             toolchains_paths = utils.acquire_toolchains(required_toolchains,

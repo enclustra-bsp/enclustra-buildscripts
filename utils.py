@@ -19,6 +19,7 @@ import archive
 import re
 import shlex
 import sys
+import signal
 
 
 class Utils:
@@ -219,3 +220,17 @@ class Utils:
                 pass
             else:
                 raise
+
+    def init_sigint_handler(self):
+        self.sigint_orig_handler = signal.getsignal(signal.SIGINT)
+
+        def signal_handler(signal, frame):
+            subprocess.call("clear")
+            self.print_message(self.logtype.INFO,
+                               "Received SIGINT - aborting.")
+            sys.exit(0)
+        signal.signal(signal.SIGINT, signal_handler)
+
+    def deinit_sigint_handler(self):
+        if self.sigint_orig_handler is not None:
+            signal.signal(signal.SIGINT, self.sigint_orig_handler)
