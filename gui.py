@@ -154,3 +154,15 @@ class Gui:
         else:
             return self.dialog.yesno("No target marked to build found!",
                                      yes_label="OK", no_label="Cancel"), []
+
+    def show_summary_menu(self, summary):
+        # question shown to user
+        w_question = "Please verify all the chosen parameters"
+        w_text = "%s\n\n%s" % (w_question, summary)
+
+        # calculate window size
+        w_height = w_text.count("\n") + 6  # num of lines + 6 for frame/buttons
+        w_width = len((max(w_text.split("\n"), key=len))) + 4  # 4 is the frame
+
+        return self.dialog.yesno(w_text, w_height, w_width,
+                                 yes_label="Proceed", no_label="Cancel")

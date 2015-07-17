@@ -399,3 +399,59 @@ class Target:
                     self.utils.print_message(self.utils.logtype.WARNING,
                                              "Error while copying file",
                                              src, ":", str(exc))
+
+    def get_summary(self):
+        # construct device lines
+        device_lines_a = []
+        device_lines_a.append("Device:")
+
+        device_lines_a.append(self.target_name.replace("_", " "))
+        device_lines = "\n".join(device_lines_a)
+
+        # construct target lines
+        target_lines_a = []
+        target_lines_a.append("Targets:")
+
+        for t in self.targets:
+            # skip targets that are not selected
+            if not (self.targets[t]["build"] or self.targets[t]["fetch"]):
+                continue
+
+            current_target_line = str(t)
+
+            current_target_line += " ("
+            # check if target is to be fetched
+            if self.targets[t]["fetch"]:
+                current_target_line += "fetch"
+
+            # add plus sign if target is to be both fetched and built
+            if self.targets[t]["build"] and self.targets[t]["fetch"]:
+                current_target_line += " + "
+
+            # check if target is to be built
+            if self.targets[t]["build"]:
+                current_target_line += "build"
+            current_target_line += ")"
+
+            target_lines_a.append(current_target_line)
+
+        target_lines = "\n".join(target_lines_a)
+
+        # construct binary lines
+        binary_lines_a = []
+        binary_lines_a.append("Binaries:")
+
+        for b in self.binaries:
+            if self.binaries[b]["chosen"]:
+                binary_lines_a.append(self.binaries[b]["description"])
+
+        binary_lines = "\n".join(binary_lines_a)
+
+        # construct the final summary
+        summary = []
+
+        summary.append(device_lines)
+        summary.append(target_lines)
+        summary.append(binary_lines)
+
+        return "\n\n".join(summary)

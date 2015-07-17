@@ -324,9 +324,16 @@ while done is False:
         code, tags = g.show_binaries_menu(binaries)
         if code == "ok":
             t.set_binaries(tags)
-            state = "DO_FETCH"
+            state = "SHOW_SUMMARY"
         else:
             state = "BUILD_MENU"
+
+    elif state == "SHOW_SUMMARY":
+        code = g.show_summary_menu(t.get_summary())
+        if code == "ok":
+            state = "DO_FETCH"
+        else:
+            state = "BINARIES_MENU"
 
     elif state == "DO_FETCH":
         # clear console
