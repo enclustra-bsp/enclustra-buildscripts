@@ -74,6 +74,14 @@ parser.add_argument("-t", "--target", action='append', required=False,
                     dest='target', metavar='target',
                     help='fetch and build on the chosen target')
 
+parser.add_argument("-f", "--fetch", action='append', required=False,
+                    dest='target_fetch', metavar='target',
+                    help='fetch the chosen target')
+
+parser.add_argument("-b", "--build", action='append', required=False,
+                    dest='target_build', metavar='target',
+                    help='build the chosen target')
+
 parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
                     help='list all targets for chosen device')
@@ -176,9 +184,24 @@ elif args.device is not None:
             print(str(count) + ". " + str(binary[0]) + default)
         sys.exit(0)
 
+    # divide targets into fetch/build groups
+    fetch_group = []
+    build_group = []
+
     if args.target is not None:
-        t.set_fetch(args.target)
-        t.set_build(args.target)
+        fetch_group.extend(args.target)
+        build_group.extend(args.target)
+
+    if args.target_fetch is not None:
+        fetch_group.extend(args.target_fetch)
+
+    if args.target_build is not None:
+        build_group.extend(args.target_build)
+
+    if fetch_group or build_group:
+        t.set_fetch(fetch_group)
+        t.set_build(build_group)
+    # else: build all default targets
 
     if args.disable_fetch is not None:
         t.set_not_fetch(args.disable_fetch)
