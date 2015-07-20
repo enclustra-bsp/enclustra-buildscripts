@@ -400,17 +400,24 @@ class Target:
                                              "Error while copying file",
                                              src, ":", str(exc))
 
-    def get_summary(self):
+    def get_summary(self, oneline=False):
+        # decide which separator to use
+        if oneline:
+            line_sep = " "
+            node_sep = ", "
+        else:
+            line_sep = "\n"
+            node_sep = "\n"
+
         # construct device lines
         device_lines_a = []
         device_lines_a.append("Device:")
 
         device_lines_a.append(self.target_name.replace("_", " "))
-        device_lines = "\n".join(device_lines_a)
+        device_lines = line_sep.join(device_lines_a)
 
         # construct target lines
         target_lines_a = []
-        target_lines_a.append("Targets:")
 
         for t in self.targets:
             # skip targets that are not selected
@@ -435,17 +442,16 @@ class Target:
 
             target_lines_a.append(current_target_line)
 
-        target_lines = "\n".join(target_lines_a)
+        target_lines = "Targets:" + line_sep + node_sep.join(target_lines_a)
 
         # construct binary lines
         binary_lines_a = []
-        binary_lines_a.append("Binaries:")
 
         for b in self.binaries:
             if self.binaries[b]["chosen"]:
                 binary_lines_a.append(self.binaries[b]["description"])
 
-        binary_lines = "\n".join(binary_lines_a)
+        binary_lines = "Binaries:" + line_sep + node_sep.join(binary_lines_a)
 
         # construct the final summary
         summary = []
@@ -454,4 +460,4 @@ class Target:
         summary.append(target_lines)
         summary.append(binary_lines)
 
-        return "\n\n".join(summary)
+        return (line_sep+"\n").join(summary)

@@ -411,5 +411,13 @@ while done is False:
         t.do_copyfiles(out_dir)
         done = True
 
+if done:
+    utils.print_message(utils.logtype.INFO, "Building finished")
+
+    for line in t.get_summary(oneline=True).split("\n"):
+        utils.print_message(utils.logtype.INFO, line)
+
+    utils.print_message(utils.logtype.INFO, "Output directory: " + out_dir)
+
 if build_log_file is not None:
     build_log_file.close()
