@@ -196,9 +196,12 @@ class Utils:
         for root, dirs, files in os.walk("targets"):
             if root == "targets":
                 continue
-            level = root.replace("targets/", '').count(os.sep)
-            indent = ' ' * 3 * (level)
-            print(' {}* {}'.format(indent, os.path.basename(root)))
+            if len(dirs) == 0:
+                # remove the leading targets catalog
+                root = root.replace("targets/", '')
+                # make the spaces copy-pasteable
+                root = root.replace(" ", "\ ")
+                print(root)
 
     class cd:
         """Context manager for changing the current working directory"""
