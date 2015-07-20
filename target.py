@@ -172,8 +172,8 @@ class Target:
         self.handle_disable("fetch")
 
     def set_not_fetch(self, fetch):
-        for target in self.targets:
-            (self.targets[target])["fetch"] = target not in fetch
+        for target in fetch:
+            (self.targets[target])["fetch"] = False
         # handle targets disabled by others
         self.handle_disable("fetch")
 
@@ -196,8 +196,8 @@ class Target:
         self.handle_disable("build")
 
     def set_not_build(self, build):
-        for target in self.targets:
-            (self.targets[target])["build"] = target not in build
+        for target in build:
+            (self.targets[target])["build"] = False
         # handle targets disabled by others
         self.handle_disable("build")
 
