@@ -52,7 +52,7 @@ parser.add_argument("-d", "--device", action='store', required=False,
                     help='specify this option to run the buildsystem in the '
                          'command line mode. The device has to be specified '
                          'in the following way: \n'
-                         '<vendor>/<module>/<base_board>/<boot_device>')
+                         '<family>/<module>/<base_board>/<boot_device>')
 
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
