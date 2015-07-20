@@ -191,10 +191,10 @@ class Utils:
         minimal = self.splittedname(minimal_version)
         return local >= minimal
 
-    def list_devices(self):
+    def list_devices(self, entry_point=""):
         print(str("List of available devices:"))
-        for root, dirs, files in os.walk("targets"):
-            if root == "targets":
+        for root, dirs, files in os.walk("targets/" + entry_point):
+            if root == "targets" + entry_point:
                 continue
             if len(dirs) == 0:
                 # remove the leading targets catalog

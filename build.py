@@ -159,6 +159,11 @@ elif args.device is not None:
         if os.path.isfile(parse_dir + "/build.ini"):
             ini_files.append(parse_dir + "/build.ini")
 
+    # check if user wants to list subdirs for the given device
+    if args.list_devices:
+        utils.list_devices(entry_point=args.device)
+        sys.exit(0)
+
     # check if it is a bottom dir
     bottom = len([n for n in os.listdir(dev_path)
                  if os.path.isdir(os.path.join(dev_path, n))]) == 0
