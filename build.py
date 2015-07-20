@@ -159,6 +159,16 @@ elif args.device is not None:
         if os.path.isfile(parse_dir + "/build.ini"):
             ini_files.append(parse_dir + "/build.ini")
 
+    # check if it is a bottom dir
+    bottom = len([n for n in os.listdir(dev_path)
+                 if os.path.isdir(os.path.join(dev_path, n))]) == 0
+
+    # exit if not
+    if not bottom:
+        utils.print_message(utils.logtype.ERROR, "device argument "
+                            "not complete: " + str(args.device))
+        sys.exit(1)
+
     device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
     t = target.Target(master_repo_path, dev_path, ini_files,
                       device_name, debug_calls, utils)
