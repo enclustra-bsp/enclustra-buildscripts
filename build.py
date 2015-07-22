@@ -32,6 +32,7 @@ master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
 done = False
 build_log_file = None
+tool_name = "Enclustra Build Environment"
 
 required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
@@ -39,60 +40,59 @@ required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["wget",   "--version", 3, "1.0"])
 
 # initialize utils object
-
 utils = utils.Utils()
 
 # setup sigint handler
 utils.init_sigint_handler()
 
 # setup argument parser
-parser = argparse.ArgumentParser(description="Enclustra's buildsystem")
-parser.add_argument("-d", "--device", action='store', required=False,
-                    dest='device', metavar='device',
-                    help='specify this option to run the buildsystem in the '
-                         'command line mode. The device has to be specified '
-                         'in the following way: \n'
-                         '<family>/<module>/<base_board>/<boot_device>')
+parser = argparse.ArgumentParser(description=tool_name, prog='tool',
+  formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=32))
 
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
                     help='list all available devices')
 
-parser.add_argument("--disable-fetch", action='append', required=False,
-                    dest='disable_fetch', metavar='target',
-                    help='exclude specific target from fetching')
-
-parser.add_argument("--fetch-history", action='append', required=False,
-                    dest='fetch_history', metavar='target',
-                    help='fetch specific target with history')
-
-parser.add_argument("--disable-build", action='append', required=False,
-                    dest='disable_build', metavar='target',
-                    help='exclude specific target from building')
-
-parser.add_argument("-t", "--target", action='append', required=False,
-                    dest='target', metavar='target',
-                    help='fetch and build on the chosen target')
-
-parser.add_argument("-f", "--fetch", action='append', required=False,
-                    dest='target_fetch', metavar='target',
-                    help='fetch the chosen target')
-
-parser.add_argument("-b", "--build", action='append', required=False,
-                    dest='target_build', metavar='target',
-                    help='build the chosen target')
+parser.add_argument("-d", "--device", action='store', required=False,
+                    dest='device', metavar='device',
+                    help='specify device as follows: \
+                       <family>/<module>/<base_board>/<boot_device>')
 
 parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
                     help='list all targets for chosen device')
+
+#parser.add_argument("--disable-fetch", action='append', required=False,
+#                    dest='disable_fetch', metavar='target',
+#                    help='exclude specific target from fetching')
+
+#parser.add_argument("--disable-build", action='append', required=False,
+#                    dest='disable_build', metavar='target',
+#                    help='exclude specific target from building')
+
+parser.add_argument("-x",  action='append', required=False,
+                    dest='target', metavar='target',
+                    help='fetch and build specific target')
+
+parser.add_argument("-f", "--fetch", action='append', required=False,
+                    dest='target_fetch', metavar='target',
+                    help='fetch specific target')
+
+parser.add_argument("-b", "--build", action='append', required=False,
+                    dest='target_build', metavar='target',
+                    help='build specific target')
+
+parser.add_argument("--fetch-history", action='append', required=False,
+                    dest='fetch_history', metavar='target',
+                    help='fetch specific target with history')
 
 parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
                     help='list all available device options for chosen device')
 
 parser.add_argument("-o", "--dev-option", action='store', required=False,
-                    dest='device_option', metavar='option_number',
-                    help='set device option. If unset default will be used')
+                    dest='device_option', metavar='index',
+                    help='set device option by index, the default one will be used if not specified')
 
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
@@ -132,7 +132,7 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision().rstrip('\n')
-tool_version = "Enclustra Build Environment (v0.0-" + revision + " (alpha))\n"+ \
+tool_version = tool_name + " (v0.0-" + revision + " (alpha))\n"+ \
                 "Running under Python version " \
               + str(sys.version.split()[0]) + "." \
               + "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
@@ -218,11 +218,11 @@ elif args.device is not None:
         t.set_build(build_group)
     # else: build all default targets
 
-    if args.disable_fetch is not None:
-        t.set_not_fetch(args.disable_fetch)
-
-    if args.disable_build is not None:
-        t.set_not_build(args.disable_build)
+#    if args.disable_fetch is not None:
+#        t.set_not_fetch(args.disable_fetch)
+#
+#    if args.disable_build is not None:
+#        t.set_not_build(args.disable_build)
 
     if args.fetch_history is not None:
         t.set_fetch_opts(args.fetch_history)
