@@ -279,7 +279,7 @@ except Exception as ex:
 
 
 # init master repository
-subprocess.call("clear")
+#subprocess.call("clear")
 utils.print_message(utils.logtype.INFO, "Initializing master repository")
 pull = False
 if os.path.isdir(master_repo_path) is True:
@@ -309,6 +309,7 @@ welcome_msg = tool_version;
 utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
 # Main loop
+g = None
 while done is False:
     if state == "INIT":
         g = gui.Gui(root_path+"/targets")
@@ -378,7 +379,8 @@ while done is False:
 
     elif state == "DO_FETCH":
         # clear console
-        subprocess.call("clear")
+        if g:
+            subprocess.call("clear")
         t.do_fetch(git_use_depth, git_use_remote)
         state = "DO_BUILD"
 
@@ -412,12 +414,13 @@ while done is False:
         done = True
 
 if done:
+    utils.print_message(utils.logtype.INFO, "-" * 80 );
     utils.print_message(utils.logtype.INFO, "Building finished")
 
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
 
-    utils.print_message(utils.logtype.INFO, "Output directory: " + out_dir)
+    utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
 
 if build_log_file is not None:
     build_log_file.close()
