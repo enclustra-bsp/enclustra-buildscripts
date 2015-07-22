@@ -200,8 +200,9 @@ class Utils:
                 # remove the leading targets catalog
                 root = root.replace("targets/", '')
                 # make the spaces copy-pasteable
-                root = root.replace(" ", "\ ")
-                print(root)
+                #root = root.replace(" ", "\ ")
+                #print(root)
+                print("\"" + root + "\"")
 
     class cd:
         """Context manager for changing the current working directory"""
