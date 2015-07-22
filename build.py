@@ -415,7 +415,7 @@ while done is False:
 
 if done:
     utils.print_message(utils.logtype.INFO, "-" * 80 );
-    utils.print_message(utils.logtype.INFO, "Building finished")
+    utils.print_message(utils.logtype.INFO, "BUILD SUCCEEDED")
 
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
