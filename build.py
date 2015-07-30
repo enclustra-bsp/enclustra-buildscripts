@@ -62,14 +62,6 @@ parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
                     help='list all targets for chosen device')
 
-#parser.add_argument("--disable-fetch", action='append', required=False,
-#                    dest='disable_fetch', metavar='target',
-#                    help='exclude specific target from fetching')
-
-#parser.add_argument("--disable-build", action='append', required=False,
-#                    dest='disable_build', metavar='target',
-#                    help='exclude specific target from building')
-
 parser.add_argument("-x",  action='append', required=False,
                     dest='target', metavar='target',
                     help='fetch and build specific target')
@@ -218,12 +210,6 @@ elif args.device is not None:
         t.set_build(build_group)
     # else: build all default targets
 
-#    if args.disable_fetch is not None:
-#        t.set_not_fetch(args.disable_fetch)
-#
-#    if args.disable_build is not None:
-#        t.set_not_build(args.disable_build)
-
     if args.fetch_history is not None:
         t.set_fetch_opts(args.fetch_history)
 
@@ -279,7 +265,6 @@ except Exception as ex:
 
 
 # init master repository
-#subprocess.call("clear")
 utils.print_message(utils.logtype.INFO, "Initializing master repository")
 pull = False
 if os.path.isdir(master_repo_path) is True:

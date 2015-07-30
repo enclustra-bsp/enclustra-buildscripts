@@ -200,8 +200,6 @@ class Utils:
                 # remove the leading targets catalog
                 root = root.replace("targets/", '')
                 # make the spaces copy-pasteable
-                #root = root.replace(" ", "\ ")
-                #print(root)
                 print("\"" + root + "\"")
 
     class cd:
