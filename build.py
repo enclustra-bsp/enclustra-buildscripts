@@ -385,8 +385,6 @@ while done is False:
         state = "DO_BUILD"
 
     elif state == "DO_BUILD":
-        # deinit sigint handler
-        utils.deinit_sigint_handler()
         required_toolchains = t.get_required_toolchains()
         try:
             toolchains_paths = utils.acquire_toolchains(required_toolchains,
