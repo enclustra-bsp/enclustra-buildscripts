@@ -345,7 +345,7 @@ while done is False:
         binaries = t.get_binaries()
         # If there are no binaries skip to the next state
         if len(binaries) == 0:
-            state = "DO_FETCH"
+            state = "SHOW_SUMMARY"
             continue
 
         code, tags = g.show_binaries_menu(binaries)
