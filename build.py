@@ -230,7 +230,7 @@ elif args.device is not None:
                 t.set_binaries(binary[0])
                 break
 
-    state = "DO_FETCH"
+    state = "DO_CLEAR_DIR"
 elif args.list_devices is True:
     utils.list_devices()
     sys.exit(0)
@@ -358,9 +358,17 @@ while done is False:
     elif state == "SHOW_SUMMARY":
         code = g.show_summary_menu(t.get_summary())
         if code == "ok":
-            state = "DO_FETCH"
+            state = "DO_CLEAR_DIR"
         else:
             state = "BINARIES_MENU"
+
+    elif state == "DO_CLEAR_DIR":
+        out_dir = root_path + "/" + "out_" + t.get_name()
+
+        if os.path.isdir(out_dir):
+            shutil.rmtree(out_dir)
+
+        state = "DO_FETCH"
 
     elif state == "DO_FETCH":
         # clear console
