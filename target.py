@@ -13,6 +13,7 @@
 
 import configparser
 import os
+import sys
 import shutil
 import archive
 
@@ -177,6 +178,18 @@ class Target:
                     (self.targets[disable])[disable_part] = False
 
     def set_fetch(self, fetch):
+        for target in fetch:
+            if not target in self.targets.keys():
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Target does not exist: ",
+                                         target)
+
+                available_targets = ", ".join(self.targets)
+
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         "Available targets: ",
+                                         available_targets)
+                sys.exit(1)
         for target in self.targets:
             (self.targets[target])["fetch"] = target in fetch
             # if the target was explicitly set to fetch
@@ -205,6 +218,18 @@ class Target:
         return build
 
     def set_build(self, build):
+        for target in build:
+            if not target in self.targets.keys():
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Target does not exist: ",
+                                         target)
+
+                available_targets = ", ".join(self.targets)
+
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         "Available targets: ",
+                                         available_targets)
+                sys.exit(1)
         for target in self.targets:
             (self.targets[target])["build"] = target in build
         # handle targets disabled by others
