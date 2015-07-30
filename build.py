@@ -409,6 +409,40 @@ while done is False:
         out_dir = root_path + "/" + "out_" + t.get_name()
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
+        state = "DO_IMAGE_GEN"
+
+    elif state == "DO_IMAGE_GEN":
+        out_dir = root_path + "/" + "out_" + t.get_name()
+        bootimage = t.get_bootimage()
+        generate_img = True
+
+        if not 'cmd' in bootimage.keys():
+            generate_img = False
+
+        if generate_img:
+            with utils.cd(out_dir):
+                for f in bootimage['files']:
+                    if not os.path.isfile(f):
+                        generate_img = False
+                        break
+
+        if generate_img:
+            utils.print_message(utils.logtype.INFO,
+                                "Generating boot image")
+            required_toolchains = t.get_required_toolchains()
+            try:
+                toolchains = utils.acquire_toolchains(required_toolchains,
+                                                      registered_toolchains,
+                                                      root_path, debug_calls)
+            except Exception as ex:
+                utils.print_message(utils.logtype.ERROR,
+                                    "Failed to acquire toolchain, skipping build!",
+                                    str(ex))
+                done = True
+                continue
+
+            t.do_custom_cmd(toolchains, out_dir, bootimage['cmd'])
+
         done = True
 
 if done:

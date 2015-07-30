@@ -28,6 +28,7 @@ class Target:
         self.toolchains = []
         self.targets = dict()
         self.binaries = dict()
+        self.bootimage = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
@@ -116,6 +117,20 @@ class Target:
                 binary_descriptor.update([("chosen", False)])
 
                 self.binaries.update([(binary, binary_descriptor)])
+
+        # get bootimage info
+        if self.config.has_section("bootimage"):
+            self.bootimage['cmd'] = self.config['bootimage']['bootimage']
+            files = []
+
+            if self.config.has_section("bootimage-required-files"):
+                for f in self.config['bootimage-required-files']:
+                    if self.config.getboolean('bootimage-required-files',f):
+                        files.append(f)
+            self.bootimage['files'] = files
+
+    def get_bootimage(self):
+        return self.bootimage
 
     def get_binaries(self):
         binaries = []
@@ -324,6 +339,20 @@ class Target:
                                                    self.master_repo_path)
                     except:
                         (self.targets[target])["build"] = False
+
+    def do_custom_cmd(self, toolchains, custom_dir, custom_cmd):
+        # store PATH
+        orig_path = os.environ["PATH"]
+        toolchain_path = ""
+        for path in toolchains:
+            toolchain_path += str(path) + ":"
+        os.environ["PATH"] = toolchain_path + orig_path
+
+        with self.utils.cd(custom_dir):
+            self.utils.call_tool(custom_cmd)
+
+        # restore original PATH
+        os.environ["PATH"] = orig_path
 
     def do_get_binaries(self, dst_path):
         for binary in self.binaries:
