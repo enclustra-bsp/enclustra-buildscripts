@@ -161,9 +161,16 @@ class Utils:
                             a = archive.Archive(os.path.basename(toolchain_location))
                             a.extract()
                         except Exception as ext:
+                            # the downloaded file is corrupted, delete it
+                            os.remove(os.path.basename(toolchain_location))
+
                             self.print_message(self.logtype.ERROR,
-                                               "Error while unpacking toolchain:",
-                                               str(ext))
+                                               "Error while unpacking",
+                                               os.path.basename(toolchain_location),
+                                               "toolchain.",
+                                               str(ext),
+                                               "- deleting.")
+
                             raise NameError("Required toolchains: " +
                                             ", ".join(required))
 

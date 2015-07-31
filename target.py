@@ -413,9 +413,13 @@ class Target:
                                             self.binaries[binary]["uri"]))
                         a.extract()
                     except Exception as exc:
+                        # the downloaded file is corrupted, delete it
+                        shutil.rmtree(download_path)
+
                         self.utils.print_message(self.utils.logtype.ERROR,
                                                  "Error while unpacking",
-                                                 binary, "binary:", exc)
+                                                 binary, "binary:", exc,
+                                                 "- deleting.")
                         continue
             # if everything went OK add path to binary descriptor
             self.binaries[binary].update([("path", download_path)])
