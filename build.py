@@ -11,18 +11,45 @@
 # \copyright Copyright (c) 2015 Enclustra GmbH, Switzerland. All rights reserved.
 # \licence This code is released under the Modified BSD licence.
 
+# Check project dependencies
+try:
+    # At first try to import only the utils module
+    # with all its dependencies. If it succeeds, a
+    # pretty error message will be printed instead
+    # of a raw one
+    import sys
+    import utils
 
-import os
-import sys
-import configparser
-import subprocess
-import shutil
-import argparse
+    # initialize utils object
+    utils = utils.Utils()
 
+except ImportError as e:
+    # could not import utils module, exit
+    print "Dependencies missing: " + str(e)
+    sys.exit(1)
 
-import target
-import gui
-import utils
+try:
+    # import the remaining modules with pretty
+    # print message in case of the exception
+    import os
+    import configparser
+    import subprocess
+    import shutil
+    import argparse
+
+    import target
+    import gui
+
+except ImportError as e:
+    # could not import one of the remaining
+    # modules
+    utils.print_message(utils.logtype.ERROR,
+                        "Dependencies missing:",
+                        e)
+    # call exit explicitly in case the break
+    # on error options is not set
+    sys.exit(1)
+
 
 registered_toolchains = dict()
 
@@ -38,9 +65,6 @@ required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
                   ["tar",    "--version", 4, "1.15"],
                   ["wget",   "--version", 3, "1.0"])
-
-# initialize utils object
-utils = utils.Utils()
 
 # setup sigint handler
 utils.init_sigint_handler()
