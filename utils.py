@@ -155,7 +155,8 @@ class Utils:
                         if self.call_tool(call) != 0:
                             self.print_message(self.logtype.ERROR,
                                                "Error while downloading toolchain")
-                            raise NameError(required)
+                            raise NameError("Required toolchains: " +
+                                            ", ".join(required))
                         try:
                             a = archive.Archive(os.path.basename(toolchain_location))
                             a.extract()
@@ -163,13 +164,14 @@ class Utils:
                             self.print_message(self.logtype.ERROR,
                                                "Error while unpacking toolchain:",
                                                str(ext))
-                            raise NameError(required)
+                            raise NameError("Required toolchains: " +
+                                            ", ".join(required))
 
                 return_paths.append(path + "/bin/" + registered[toolchain]["path"])
             else:
                 self.print_message(self.logtype.ERROR, required,
                                    "toolchain is not registered")
-                raise NameError(required)
+                raise NameError("Required toolchains: " + ", ".join(required))
         return return_paths
 
     def tryint(self, x):
