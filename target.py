@@ -444,6 +444,8 @@ class Target:
                                      "Copying binaries")
         # copy binaries
         for binary in self.binaries:
+            if not 'path' in self.binaries[binary].keys():
+                continue
             for outfile in (self.binaries[binary])["copy_files"]:
                 src = self.binaries[binary]["path"] + "/" + outfile[1]
                 dst = dst_path + "/" + outfile[0]
