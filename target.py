@@ -13,6 +13,7 @@
 
 import configparser
 import os
+import sys
 import shutil
 import archive
 
@@ -28,6 +29,7 @@ class Target:
         self.toolchains = []
         self.targets = dict()
         self.binaries = dict()
+        self.bootimage = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
@@ -117,6 +119,20 @@ class Target:
 
                 self.binaries.update([(binary, binary_descriptor)])
 
+        # get bootimage info
+        if self.config.has_section("bootimage"):
+            self.bootimage['cmd'] = self.config['bootimage']['bootimage']
+            files = []
+
+            if self.config.has_section("bootimage-required-files"):
+                for f in self.config['bootimage-required-files']:
+                    if self.config.getboolean('bootimage-required-files',f):
+                        files.append(f)
+            self.bootimage['files'] = files
+
+    def get_bootimage(self):
+        return self.bootimage
+
     def get_binaries(self):
         binaries = []
         for binary in self.binaries:
@@ -162,6 +178,18 @@ class Target:
                     (self.targets[disable])[disable_part] = False
 
     def set_fetch(self, fetch):
+        for target in fetch:
+            if not target in self.targets.keys():
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Target does not exist: ",
+                                         target)
+
+                available_targets = ", ".join(self.targets)
+
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         "Available targets: ",
+                                         available_targets)
+                sys.exit(1)
         for target in self.targets:
             (self.targets[target])["fetch"] = target in fetch
             # if the target was explicitly set to fetch
@@ -190,6 +218,18 @@ class Target:
         return build
 
     def set_build(self, build):
+        for target in build:
+            if not target in self.targets.keys():
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Target does not exist: ",
+                                         target)
+
+                available_targets = ", ".join(self.targets)
+
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         "Available targets: ",
+                                         available_targets)
+                sys.exit(1)
         for target in self.targets:
             (self.targets[target])["build"] = target in build
         # handle targets disabled by others
@@ -325,6 +365,20 @@ class Target:
                     except:
                         (self.targets[target])["build"] = False
 
+    def do_custom_cmd(self, toolchains, custom_dir, custom_cmd):
+        # store PATH
+        orig_path = os.environ["PATH"]
+        toolchain_path = ""
+        for path in toolchains:
+            toolchain_path += str(path) + ":"
+        os.environ["PATH"] = toolchain_path + orig_path
+
+        with self.utils.cd(custom_dir):
+            self.utils.call_tool(custom_cmd)
+
+        # restore original PATH
+        os.environ["PATH"] = orig_path
+
     def do_get_binaries(self, dst_path):
         for binary in self.binaries:
             if (self.binaries[binary])["chosen"] is False:
@@ -359,9 +413,13 @@ class Target:
                                             self.binaries[binary]["uri"]))
                         a.extract()
                     except Exception as exc:
+                        # the downloaded file is corrupted, delete it
+                        shutil.rmtree(download_path)
+
                         self.utils.print_message(self.utils.logtype.ERROR,
                                                  "Error while unpacking",
-                                                 binary, "binary:", exc)
+                                                 binary, "binary:", exc,
+                                                 "- deleting.")
                         continue
             # if everything went OK add path to binary descriptor
             self.binaries[binary].update([("path", download_path)])
@@ -390,6 +448,8 @@ class Target:
                                      "Copying binaries")
         # copy binaries
         for binary in self.binaries:
+            if not 'path' in self.binaries[binary].keys():
+                continue
             for outfile in (self.binaries[binary])["copy_files"]:
                 src = self.binaries[binary]["path"] + "/" + outfile[1]
                 dst = dst_path + "/" + outfile[0]

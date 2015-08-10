@@ -11,18 +11,45 @@
 # \copyright Copyright (c) 2015 Enclustra GmbH, Switzerland. All rights reserved.
 # \licence This code is released under the Modified BSD licence.
 
+# Check project dependencies
+try:
+    # At first try to import only the utils module
+    # with all its dependencies. If it succeeds, a
+    # pretty error message will be printed instead
+    # of a raw one
+    import sys
+    import utils
 
-import os
-import sys
-import configparser
-import subprocess
-import shutil
-import argparse
+    # initialize utils object
+    utils = utils.Utils()
 
+except ImportError as e:
+    # could not import utils module, exit
+    print "Dependencies missing: " + str(e)
+    sys.exit(1)
 
-import target
-import gui
-import utils
+try:
+    # import the remaining modules with pretty
+    # print message in case of the exception
+    import os
+    import configparser
+    import subprocess
+    import shutil
+    import argparse
+
+    import target
+    import gui
+
+except ImportError as e:
+    # could not import one of the remaining
+    # modules
+    utils.print_message(utils.logtype.ERROR,
+                        "Dependencies missing:",
+                        e)
+    # call exit explicitly in case the break
+    # on error options is not set
+    sys.exit(1)
+
 
 registered_toolchains = dict()
 
@@ -32,67 +59,56 @@ master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
 done = False
 build_log_file = None
+tool_name = "Enclustra Build Environment"
 
 required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
                   ["tar",    "--version", 4, "1.15"],
                   ["wget",   "--version", 3, "1.0"])
 
-# initialize utils object
-
-utils = utils.Utils()
-
 # setup sigint handler
 utils.init_sigint_handler()
 
 # setup argument parser
-parser = argparse.ArgumentParser(description="Enclustra's buildsystem")
-parser.add_argument("-d", "--device", action='store', required=False,
-                    dest='device', metavar='device',
-                    help='specify this option to run the buildsystem in the '
-                         'command line mode. The device has to be specified '
-                         'in the following way: \n'
-                         '<family>/<module>/<base_board>/<boot_device>')
+parser = argparse.ArgumentParser(description=tool_name, prog='tool',
+  formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=32))
 
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
                     help='list all available devices')
 
-parser.add_argument("--disable-fetch", action='append', required=False,
-                    dest='disable_fetch', metavar='target',
-                    help='exclude specific target from fetching')
-
-parser.add_argument("--fetch-history", action='append', required=False,
-                    dest='fetch_history', metavar='target',
-                    help='fetch specific target with history')
-
-parser.add_argument("--disable-build", action='append', required=False,
-                    dest='disable_build', metavar='target',
-                    help='exclude specific target from building')
-
-parser.add_argument("-t", "--target", action='append', required=False,
-                    dest='target', metavar='target',
-                    help='fetch and build on the chosen target')
-
-parser.add_argument("-f", "--fetch", action='append', required=False,
-                    dest='target_fetch', metavar='target',
-                    help='fetch the chosen target')
-
-parser.add_argument("-b", "--build", action='append', required=False,
-                    dest='target_build', metavar='target',
-                    help='build the chosen target')
+parser.add_argument("-d", "--device", action='store', required=False,
+                    dest='device', metavar='device',
+                    help='specify device as follows: \
+                       <family>/<module>/<base_board>/<boot_device>')
 
 parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
                     help='list all targets for chosen device')
+
+parser.add_argument("-x",  action='append', required=False,
+                    dest='target', metavar='target',
+                    help='fetch and build specific target')
+
+parser.add_argument("-f", "--fetch", action='append', required=False,
+                    dest='target_fetch', metavar='target',
+                    help='fetch specific target')
+
+parser.add_argument("-b", "--build", action='append', required=False,
+                    dest='target_build', metavar='target',
+                    help='build specific target')
+
+parser.add_argument("--fetch-history", action='append', required=False,
+                    dest='fetch_history', metavar='target',
+                    help='fetch specific target with history')
 
 parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
                     help='list all available device options for chosen device')
 
 parser.add_argument("-o", "--dev-option", action='store', required=False,
-                    dest='device_option', metavar='option_number',
-                    help='set device option. If unset default will be used')
+                    dest='device_option', metavar='index',
+                    help='set device option by index, the default one will be used if not specified')
 
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
@@ -132,7 +148,7 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision().rstrip('\n')
-tool_version = "Enclustra Build Environment (v0.0-" + revision + " (alpha))\n"+ \
+tool_version = tool_name + " (v0.0-" + revision + " (alpha))\n"+ \
                 "Running under Python version " \
               + str(sys.version.split()[0]) + "." \
               + "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
@@ -218,12 +234,6 @@ elif args.device is not None:
         t.set_build(build_group)
     # else: build all default targets
 
-    if args.disable_fetch is not None:
-        t.set_not_fetch(args.disable_fetch)
-
-    if args.disable_build is not None:
-        t.set_not_build(args.disable_build)
-
     if args.fetch_history is not None:
         t.set_fetch_opts(args.fetch_history)
 
@@ -244,7 +254,7 @@ elif args.device is not None:
                 t.set_binaries(binary[0])
                 break
 
-    state = "DO_FETCH"
+    state = "DO_CLEAR_DIR"
 elif args.list_devices is True:
     utils.list_devices()
     sys.exit(0)
@@ -279,7 +289,6 @@ except Exception as ex:
 
 
 # init master repository
-subprocess.call("clear")
 utils.print_message(utils.logtype.INFO, "Initializing master repository")
 pull = False
 if os.path.isdir(master_repo_path) is True:
@@ -309,6 +318,7 @@ welcome_msg = tool_version;
 utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
 # Main loop
+g = None
 while done is False:
     if state == "INIT":
         g = gui.Gui(root_path+"/targets")
@@ -359,7 +369,7 @@ while done is False:
         binaries = t.get_binaries()
         # If there are no binaries skip to the next state
         if len(binaries) == 0:
-            state = "DO_FETCH"
+            state = "SHOW_SUMMARY"
             continue
 
         code, tags = g.show_binaries_menu(binaries)
@@ -372,19 +382,26 @@ while done is False:
     elif state == "SHOW_SUMMARY":
         code = g.show_summary_menu(t.get_summary())
         if code == "ok":
-            state = "DO_FETCH"
+            state = "DO_CLEAR_DIR"
         else:
             state = "BINARIES_MENU"
 
+    elif state == "DO_CLEAR_DIR":
+        out_dir = root_path + "/" + "out_" + t.get_name()
+
+        if os.path.isdir(out_dir):
+            shutil.rmtree(out_dir)
+
+        state = "DO_FETCH"
+
     elif state == "DO_FETCH":
         # clear console
-        subprocess.call("clear")
+        if g:
+            subprocess.call("clear")
         t.do_fetch(git_use_depth, git_use_remote)
         state = "DO_BUILD"
 
     elif state == "DO_BUILD":
-        # deinit sigint handler
-        utils.deinit_sigint_handler()
         required_toolchains = t.get_required_toolchains()
         try:
             toolchains_paths = utils.acquire_toolchains(required_toolchains,
@@ -409,15 +426,50 @@ while done is False:
         out_dir = root_path + "/" + "out_" + t.get_name()
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
+        state = "DO_IMAGE_GEN"
+
+    elif state == "DO_IMAGE_GEN":
+        out_dir = root_path + "/" + "out_" + t.get_name()
+        bootimage = t.get_bootimage()
+        generate_img = True
+
+        if not 'cmd' in bootimage.keys():
+            generate_img = False
+
+        if generate_img:
+            with utils.cd(out_dir):
+                for f in bootimage['files']:
+                    if not os.path.isfile(f):
+                        generate_img = False
+                        break
+
+        if generate_img:
+            utils.print_message(utils.logtype.INFO,
+                                "Generating boot image")
+            required_toolchains = t.get_required_toolchains()
+            try:
+                toolchains = utils.acquire_toolchains(required_toolchains,
+                                                      registered_toolchains,
+                                                      root_path, debug_calls)
+            except Exception as ex:
+                utils.print_message(utils.logtype.ERROR,
+                                    "Failed to acquire toolchain, skipping build!",
+                                    str(ex))
+                done = True
+                continue
+
+            t.do_custom_cmd(toolchains, out_dir, bootimage['cmd'])
+
         done = True
 
 if done:
-    utils.print_message(utils.logtype.INFO, "Building finished")
+    utils.print_message(utils.logtype.INFO, "-" * 80 );
+    utils.print_message(utils.logtype.INFO, "BUILD SUCCEEDED")
 
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
 
-    utils.print_message(utils.logtype.INFO, "Output directory: " + out_dir)
+    utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
 
 if build_log_file is not None:
     build_log_file.close()

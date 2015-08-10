@@ -155,21 +155,30 @@ class Utils:
                         if self.call_tool(call) != 0:
                             self.print_message(self.logtype.ERROR,
                                                "Error while downloading toolchain")
-                            raise NameError(required)
+                            raise NameError("Required toolchains: " +
+                                            ", ".join(required))
                         try:
                             a = archive.Archive(os.path.basename(toolchain_location))
                             a.extract()
                         except Exception as ext:
+                            # the downloaded file is corrupted, delete it
+                            os.remove(os.path.basename(toolchain_location))
+
                             self.print_message(self.logtype.ERROR,
-                                               "Error while unpacking toolchain:",
-                                               str(ext))
-                            raise NameError(required)
+                                               "Error while unpacking",
+                                               os.path.basename(toolchain_location),
+                                               "toolchain.",
+                                               str(ext),
+                                               "- deleting.")
+
+                            raise NameError("Required toolchains: " +
+                                            ", ".join(required))
 
                 return_paths.append(path + "/bin/" + registered[toolchain]["path"])
             else:
                 self.print_message(self.logtype.ERROR, required,
                                    "toolchain is not registered")
-                raise NameError(required)
+                raise NameError("Required toolchains: " + ", ".join(required))
         return return_paths
 
     def tryint(self, x):
@@ -200,8 +209,7 @@ class Utils:
                 # remove the leading targets catalog
                 root = root.replace("targets/", '')
                 # make the spaces copy-pasteable
-                root = root.replace(" ", "\ ")
-                print(root)
+                print("\"" + root + "\"")
 
     class cd:
         """Context manager for changing the current working directory"""
