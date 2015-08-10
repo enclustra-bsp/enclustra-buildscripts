@@ -45,6 +45,14 @@ class Utils:
         self.log_file = None
         self.quiet_mode = False
         self.break_on_error = False
+        self.warning_count = 0
+        self.error_count = 0
+
+    def get_warning_count(self):
+        return self.warning_count
+
+    def get_error_count(self):
+        return self.error_count
 
     def set_debug_calls(self, value):
         self.debug = value
@@ -66,8 +74,10 @@ class Utils:
             textcolor = self.bcolors.BOLD + self.bcolors.OK
         elif loglevel == self.logtype.WARNING:
             textcolor = self.bcolors.BOLD + self.bcolors.WARNING + "WARNING: "
+            self.warning_count += 1
         elif loglevel == self.logtype.ERROR:
             textcolor = self.bcolors.BOLD + self.bcolors.ERROR + "ERROR: "
+            self.error_count += 1
         else:
             textcolor = ""
 

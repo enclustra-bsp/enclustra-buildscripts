@@ -463,8 +463,17 @@ while done is False:
         done = True
 
 if done:
-    utils.print_message(utils.logtype.INFO, "-" * 80 );
-    utils.print_message(utils.logtype.INFO, "BUILD SUCCEEDED")
+    utils.print_message(utils.logtype.INFO, "-" * 80)
+    if utils.get_error_count():
+        utils.print_message(utils.logtype.ERROR, "BUILD FAILED")
+        sys.exit(1)
+    else:
+        msg = "BUILD_SUCCEEDED"
+        msg_type = utils.logtype.INFO
+        if utils.get_warning_count():
+            msg += " with" + str(utils.get_warning_count()) + " warnings"
+            msg_type = utils.logtype.WARNING
+        utils.print_message(msg_type, "BUILD SUCCEEDED")
 
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
