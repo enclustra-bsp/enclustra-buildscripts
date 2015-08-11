@@ -344,7 +344,9 @@ class Target:
                                                  "Fail to build:",
                                                  command, "for the target",
                                                  str(target))
-                # build parallel targets
+                        (self.targets[target])["build"] = False
+
+                # build targets
                 for command in (self.targets[target])["build_commands"]:
                     try:
                         self.call_build_tool(command, target, 0)
@@ -353,6 +355,7 @@ class Target:
                                                  "Fail to build:",
                                                  command, "for the target",
                                                  str(target))
+                        (self.targets[target])["build"] = False
 
                 # restore original PATH
                 os.environ["PATH"] = orig_path
