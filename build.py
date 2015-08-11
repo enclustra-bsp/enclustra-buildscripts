@@ -254,7 +254,7 @@ elif args.device is not None:
                 t.set_binaries(binary[0])
                 break
 
-    state = "DO_CLEAR_DIR"
+    state = "DO_FETCH"
 elif args.list_devices is True:
     utils.list_devices()
     sys.exit(0)
