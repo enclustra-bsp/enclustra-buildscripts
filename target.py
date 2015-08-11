@@ -86,6 +86,7 @@ class Target:
             target_descriptor.update([("fetch", target_active)])
             target_descriptor.update([("history", False)])
             target_descriptor.update([("build", target_active)])
+            target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
             target_descriptor.update([("build_commands",
                                      target_build_commands)])
@@ -313,6 +314,8 @@ class Target:
                                          "for", target)
                 # mark as not built
                 (self.targets[target])["build"] = False
+                # set build error
+                (self.targets[target])["build_error"] = True
             else:
                 self.utils.print_message(self.utils.logtype.OK, command,
                                          "completed successfully")
@@ -362,6 +365,7 @@ class Target:
                                                    self.master_repo_path)
                     except:
                         (self.targets[target])["build"] = False
+                        (self.targets[target])["build_error"] = True
 
     def do_custom_cmd(self, toolchains, custom_dir, custom_cmd):
         # store PATH
@@ -439,6 +443,18 @@ class Target:
                         self.utils.print_message(self.utils.logtype.WARNING,
                                                  "Error while copying file",
                                                  src, ":", str(exc))
+
+            # delete any existing previous products of failed builds
+            if (self.targets[target])["build_error"] is True:
+                for outfile in (self.targets[target])["copy_files"]:
+                    file_path = dst_path + "/" + outfile[0]
+                    try:
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+                    except Exception as exc:
+                        self.utils.print_message(self.utils.logtype.WARNING,
+                                                 "Error while deleting file",
+                                                 file_path, ":", str(exc))
 
         # there are some binaries
         if bool(self.binaries) is True:
