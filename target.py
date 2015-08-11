@@ -124,12 +124,18 @@ class Target:
         if self.config.has_section("bootimage"):
             self.bootimage['cmd'] = self.config['bootimage']['bootimage']
             files = []
+            result_files = []
 
             if self.config.has_section("bootimage-required-files"):
                 for f in self.config['bootimage-required-files']:
                     if self.config.getboolean('bootimage-required-files',f):
                         files.append(f)
+            if self.config.has_section("bootimage-required-files"):
+                for f in self.config['bootimage-result-files']:
+                    if self.config.getboolean('bootimage-result-files', f):
+                        result_files.append(f)
             self.bootimage['files'] = files
+            self.bootimage['result_files'] = result_files
 
     def get_bootimage(self):
         return self.bootimage
