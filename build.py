@@ -455,14 +455,15 @@ while done is False:
             # if the image was not generated we need to delete previously
             # generated files
             with utils.cd(out_dir):
-                for f in bootimage['result_files']:
-                    if os.path.isfile(f):
-                        try:
-                            os.remove(f)
-                        except Exception as exp:
-                            utils.print_message(utils.logtype.WARNING,
-                                                "Failed to remove file",
-                                                f, ":", str(exc))
+                if 'result_files' in bootimage.keys():
+                    for f in bootimage['result_files']:
+                        if os.path.isfile(f):
+                            try:
+                                os.remove(f)
+                            except Exception as exp:
+                                utils.print_message(utils.logtype.WARNING,
+                                                    "Failed to remove file",
+                                                    f, ":", str(exc))
         done = True
 
 if done:
