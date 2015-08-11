@@ -363,7 +363,10 @@ while done is False:
         code, tags = g.show_build_menu(t.get_build())
         if code == "ok":
             t.set_build(tags)
-            state = "BINARIES_MENU"
+            if not t.fetch_only_run():
+                state = "BINARIES_MENU"
+            else:
+                state = "SHOW_SUMMARY"
         else:
             state = "FETCH_MENU"
 
@@ -386,7 +389,10 @@ while done is False:
         if code == "ok":
             state = "DO_FETCH"
         else:
-            state = "BINARIES_MENU"
+            if not t.fetch_only_run():
+                state = "BINARIES_MENU"
+            else:
+                state = "BUILD_MENU"
 
     elif state == "DO_FETCH":
         # clear console
@@ -412,9 +418,11 @@ while done is False:
         state = "HANDLE_BINARIES"
 
     elif state == "HANDLE_BINARIES":
+        state = "DO_COPYFILES"
+        if not t.fetch_only_run():
+           continue;
         binaries_path = root_path + "/binaries"
         t.do_get_binaries(binaries_path)
-        state = "DO_COPYFILES"
 
     elif state == "DO_COPYFILES":
         out_dir = root_path + "/" + "out_" + t.get_name()

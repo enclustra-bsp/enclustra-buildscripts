@@ -393,7 +393,15 @@ class Target:
         # restore original PATH
         os.environ["PATH"] = orig_path
 
+    def fetch_only_run(self):
+        for target in self.targets:
+            if (self.targets[target])["build"]:
+                return False
+        return True
+
     def do_get_binaries(self, dst_path):
+        if self.fetch_only_run():
+            return
         for binary in self.binaries:
             if (self.binaries[binary])["chosen"] is False:
                 continue
@@ -469,7 +477,7 @@ class Target:
                                                  file_path, ":", str(exc))
 
         # there are some binaries
-        if bool(self.binaries) is True:
+        if bool(self.binaries) and not self.fetch_only_run():
             self.utils.print_message(self.utils.logtype.INFO,
                                      "Copying binaries")
         # copy binaries
@@ -544,6 +552,7 @@ class Target:
 
         summary.append(device_lines)
         summary.append(target_lines)
-        summary.append(binary_lines)
+        if not self.fetch_only_run():
+            summary.append(binary_lines)
 
         return (line_sep+"\n").join(summary)
