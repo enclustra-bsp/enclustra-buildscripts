@@ -305,16 +305,25 @@ class Target:
         call = command
         if nthreads != 0:
             call += " -j" + str(nthreads)
-        sp = self.utils.call_tool(call)
-        if sp != 0:
+        try:
+            sp = self.utils.call_tool(call)
+            if sp != 0:
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Error running", call,
+                                         "for", target)
+                # mark as not built
+                (self.targets[target])["build"] = False
+            else:
+                self.utils.print_message(self.utils.logtype.OK, command,
+                                         "completed successfully")
+        except Exception as exc:
             self.utils.print_message(self.utils.logtype.ERROR,
-                                     "Error running", call,
-                                     "for", target)
+                                     "Error while running", call,
+                                     "for", target, ":", str(exc))
             # mark as not built
             (self.targets[target])["build"] = False
-        else:
-            self.utils.print_message(self.utils.logtype.OK, command,
-                                     "completed successfully")
+            # set build error
+            (self.targets[target])["build_error"] = True
 
     def do_build(self, toolchains_paths, nthreads):
         for target in self.targets:
@@ -337,25 +346,11 @@ class Target:
 
                 # build parallel targets
                 for command in (self.targets[target])["parallelbuild_commands"]:
-                    try:
-                        self.call_build_tool(command, target, nthreads)
-                    except:
-                        self.utils.print_message(self.utils.logtype.ERROR,
-                                                 "Fail to build:",
-                                                 command, "for the target",
-                                                 str(target))
-                        (self.targets[target])["build"] = False
+                    self.call_build_tool(command, target, nthreads)
 
                 # build targets
                 for command in (self.targets[target])["build_commands"]:
-                    try:
-                        self.call_build_tool(command, target, 0)
-                    except:
-                        self.utils.print_message(self.utils.logtype.ERROR,
-                                                 "Fail to build:",
-                                                 command, "for the target",
-                                                 str(target))
-                        (self.targets[target])["build"] = False
+                    self.call_build_tool(command, target, 0)
 
                 # restore original PATH
                 os.environ["PATH"] = orig_path
