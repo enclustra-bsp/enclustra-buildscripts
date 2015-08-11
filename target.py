@@ -84,8 +84,10 @@ class Target:
             target_descriptor.update([("help", target_help)])
             target_descriptor.update([("disable", target_disable)])
             target_descriptor.update([("fetch", target_active)])
+            target_descriptor.update([("disable_fetch", False)])
             target_descriptor.update([("history", False)])
             target_descriptor.update([("build", target_active)])
+            target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
             target_descriptor.update([("build_commands",
@@ -182,7 +184,7 @@ class Target:
             if (self.targets[target])[disable_part] is True:
                 disable = (self.targets[target])["disable"]
                 if disable is not None:
-                    (self.targets[disable])[disable_part] = False
+                    (self.targets[disable])["disable_"+disable_part] = True
 
     def set_fetch(self, fetch):
         for target in fetch:
@@ -258,6 +260,8 @@ class Target:
                                      "Consider upgrading your git version.")
         for target in self.targets:
             if (self.targets[target])["fetch"] is False:
+                continue
+            if (self.targets[target])["disable_fetch"] is True:
                 continue
             self.utils.print_message(self.utils.logtype.INFO, "Fetching",
                                      target)
@@ -340,6 +344,8 @@ class Target:
                 # skip targets unmarked for building
                 self.utils.print_message(self.utils.logtype.INFO,
                                          "Skipping build of target:", target)
+                continue
+            if self.targets[target]["disable_build"] is True:
                 continue
             self.utils.print_message(self.utils.logtype.INFO, "Building",
                                      target)
