@@ -76,10 +76,12 @@ class Utils:
             self.log_file.flush()
 
         print(textcolor + " ".join(str(i) for i in args) + self.bcolors.ENDC)
-
-        if self.break_on_error is True and loglevel == self.logtype.ERROR:
-            print("Break on error is set. Terminating run!!")
-            sys.exit(1)
+        
+        if loglevel == self.logtype.ERROR:
+            print('\n')
+            if self.break_on_error is True:
+                print("Break on error is set. Terminating run!")
+                sys.exit(1)
 
     def call_tool(self, call):
         if self.debug is True:
@@ -236,7 +238,7 @@ class Utils:
         self.sigint_orig_handler = signal.getsignal(signal.SIGINT)
 
         def signal_handler(signal, frame):
-            subprocess.call("clear")
+            #subprocess.call("clear")
             self.print_message(self.logtype.INFO,
                                "Received SIGINT - aborting.")
             sys.exit(0)
