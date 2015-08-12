@@ -485,9 +485,13 @@ if done:
         msg = "BUILD_SUCCEEDED"
         msg_type = utils.logtype.INFO
         if utils.get_warning_count():
-            msg += " with" + str(utils.get_warning_count()) + " warnings"
+            msg += " with " + str(utils.get_warning_count())
+            if utils.get_warning_count() == 1:
+                msg += " warning"
+            else:
+                msg += " warnings"
             msg_type = utils.logtype.WARNING
-        utils.print_message(msg_type, "BUILD SUCCEEDED")
+        utils.print_message(msg_type, msg)
 
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
