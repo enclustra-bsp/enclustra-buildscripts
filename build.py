@@ -65,8 +65,7 @@ required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
                   ["tar",    "--version", 4, "1.15"],
                   ["wget",   "--version", 3, "1.0"],
-                  ["gcc",    "--version", 3, "4.8.3"],
-                  ["g++",    "--version", 3, "4.8.3"])
+                  ["gcc",    "--version", 3, "4.8.3"])
 
 # setup sigint handler
 utils.init_sigint_handler()
