@@ -459,6 +459,8 @@ class Target:
                     dst = dst_path + "/" + outfile[0]
                     try:
                         shutil.copyfile(src, dst)
+                        self.utils.print_message(self.utils.logtype.INFO,
+                                                 "Copying", src, "to", dst)
                     except Exception as exc:
                         self.utils.print_message(self.utils.logtype.WARNING,
                                                  "Error while copying file",
@@ -489,6 +491,8 @@ class Target:
                 dst = dst_path + "/" + outfile[0]
                 try:
                     shutil.copyfile(src, dst)
+                    self.utils.print_message(self.utils.logtype.INFO,
+                                             "Copying", src, "to", dst)
                 except Exception as exc:
                     self.utils.print_message(self.utils.logtype.WARNING,
                                              "Error while copying file",
