@@ -48,6 +48,13 @@ class Utils:
         self.warning_count = 0
         self.error_count = 0
 
+    def remove_folder(self, folder):
+        try:
+            shutil.rmtree(folder)
+        except Exception as exc:
+            self.print_message(self.logtype.WARNING, "Error while deleting",
+                               "folder", folder, ":", str(exc))
+
     def get_warning_count(self):
         return self.warning_count
 

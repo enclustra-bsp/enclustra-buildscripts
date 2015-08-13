@@ -113,6 +113,10 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
                     help='set device option by index, the default one will be used if not specified')
 
+parser.add_argument("-c", "--clean-all", action='store_true',
+                    required=False, dest='clean_all',
+                    help='Delete all the downloaded code, binaries, tools and produced files')
+
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
                     help='print version')
@@ -161,6 +165,20 @@ args = parser.parse_args()
 
 if args.version is True:
     print(str("\n" + tool_version + "\n"))
+    sys.exit(0)
+
+elif args.clean_all is True:
+    utils.print_message(utils.logtype.INFO, "Cleaning ...")
+    utils.remove_folder(root_path + "/bin")
+    utils.remove_folder(root_path + "/binaries")
+    utils.remove_folder(root_path + "/sources")
+    # get all the output dirs
+    dirs = [name for name in os.listdir(root_path) if
+            os.path.isdir(os.path.join(root_path, name))]
+    out_dirs = filter(lambda pref: 'out_' in pref, dirs)
+    for directory in out_dirs:
+        utils.remove_folder(root_path + "/" + directory)
+    utils.print_message(utils.logtype.INFO, "Done.")
     sys.exit(0)
 
 # if we're in console mode
