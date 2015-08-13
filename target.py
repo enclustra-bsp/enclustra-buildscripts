@@ -170,7 +170,7 @@ class Target:
     def get_fetch(self):
         fetch = []
         for target in self.targets:
-            help_msg = self.targets[target]["help"]
+            help_msg = "Fetch " + self.targets[target]["help"]
             if self.targets[target]["disable"] is not None:
                 help_msg += " Choosing this target will disable fetching " +\
                             "of the " + self.targets[target]["disable"] + \
@@ -217,7 +217,7 @@ class Target:
     def get_build(self):
         build = []
         for target in self.targets:
-            help_msg = self.targets[target]["help"]
+            help_msg = "Build " + self.targets[target]["help"]
             if self.targets[target]["disable"] is not None:
                 help_msg += " Choosing this target will disable building " +\
                             "of the " + self.targets[target]["disable"] + \
