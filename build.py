@@ -421,8 +421,8 @@ while done is False:
 
     elif state == "HANDLE_BINARIES":
         state = "DO_COPYFILES"
-        if not t.fetch_only_run():
-           continue;
+        if t.fetch_only_run():
+            continue;
         binaries_path = root_path + "/binaries"
         t.do_get_binaries(binaries_path)
 
