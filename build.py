@@ -273,6 +273,9 @@ for tool in required_tools:
     if utils.check_tool(tool[0], tool[1], tool[2], tool[3]) is False:
         utils.print_message(utils.logtype.ERROR, "Version of", tool[0],
                             "has to be", tool[3], "or greater!")
+        utils.print_message(utils.logtype.INFO, "For more information,"
+                            " including list of required tools and packages,"
+                            " refer to the user documentation.")
         sys.exit(1)
 
 # Git before version 1.8.4 didn't support submodule shallow clone
