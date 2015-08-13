@@ -498,7 +498,8 @@ if done:
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
 
-    utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
+    if not t.fetch_only_run():
+        utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
 
 if build_log_file is not None:
     build_log_file.close()
