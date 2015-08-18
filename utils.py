@@ -50,7 +50,8 @@ class Utils:
 
     def remove_folder(self, folder):
         try:
-            shutil.rmtree(folder)
+            if os.path.isdir(folder):
+                shutil.rmtree(folder)
         except Exception as exc:
             self.print_message(self.logtype.WARNING, "Error while deleting",
                                "folder", folder, ":", str(exc))
