@@ -494,6 +494,44 @@ class Target:
                                              "Error while copying file",
                                              src, ":", str(exc))
 
+
+    def do_generate_image(self, directory, toolchains_paths):
+        bootimage = self.get_bootimage()
+        generate_img = True
+
+        # there is no bootimage to build
+        if 'cmd' not in bootimage.keys():
+            return
+
+        # check if every required file is accessible
+        with self.utils.cd(directory):
+            for f in bootimage['files']:
+                if not os.path.isfile(f):
+                    generate_img = False
+                    break
+
+        # if dependancies are met
+        if generate_img:
+            self.utils.print_message(self.utils.logtype.INFO,
+                                "Generating boot image")
+            # TODO: check errors
+            self.do_custom_cmd(toolchains_paths, directory, bootimage['cmd'])
+
+        if not generate_img:
+            # if the image was not generated we need to delete previously
+            # generated files
+            with self.utils.cd(directory):
+                if 'result_files' in bootimage.keys():
+                    for f in bootimage['result_files']:
+                        if os.path.isfile(f):
+                            try:
+                                os.remove(f)
+                            except Exception as exc:
+                                self.utils.print_message(self.utils.logtype.WARNING,
+                                                    "Failed to remove file",
+                                                    f, ":", str(exc))
+
+
     def get_summary(self, oneline=False):
         # decide which separator to use
         if oneline:
