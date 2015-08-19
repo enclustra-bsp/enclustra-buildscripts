@@ -171,10 +171,6 @@ class Target:
         fetch = []
         for target in self.targets:
             help_msg = "Fetch " + self.targets[target]["help"]
-            if self.targets[target]["disable"] is not None:
-                help_msg += " Choosing this target will disable fetching " +\
-                            "of the " + self.targets[target]["disable"] + \
-                            " target."
             fetch.append([target, "", (self.targets[target])["fetch"],
                          help_msg])
         return fetch
