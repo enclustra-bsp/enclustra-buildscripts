@@ -158,7 +158,7 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision().rstrip('\n')
-tool_version = tool_name + " (v0.0-" + revision + " (alpha))\n"\
+tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
     "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
