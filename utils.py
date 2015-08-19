@@ -94,7 +94,7 @@ class Utils:
             self.log_file.flush()
 
         print(textcolor + " ".join(str(i) for i in args) + self.bcolors.ENDC)
- 
+
         if loglevel == self.logtype.ERROR:
             if self.break_on_error is True:
                 print('\n')
