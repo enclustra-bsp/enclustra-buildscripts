@@ -74,7 +74,8 @@ utils.init_sigint_handler()
 
 # setup argument parser
 parser = argparse.ArgumentParser(description=tool_name, prog='tool',
-  formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=32))
+                                 formatter_class=lambda prog:
+                                 argparse.HelpFormatter(prog, max_help_position=32))
 
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
@@ -111,11 +112,13 @@ parser.add_argument("--list-dev-options", action='store_true', required=False,
 
 parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
-                    help='set device option by index, the default one will be used if not specified')
+                    help='set device option by index, the default one will'
+                    ' be used if not specified')
 
 parser.add_argument("-c", "--clean-all", action='store_true',
                     required=False, dest='clean_all',
-                    help='Delete all the downloaded code, binaries, tools and produced files')
+                    help='Delete all the downloaded code, binaries, tools and'
+                    ' produced files')
 
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
@@ -155,11 +158,11 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision().rstrip('\n')
-tool_version = tool_name + " (v0.0-" + revision + " (alpha))\n"+ \
-                "Running under Python version " \
-              + str(sys.version.split()[0]) + "." \
-              + "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
-              "\nAll rights reserved."
+tool_version = tool_name + " (v0.0-" + revision + " (alpha))\n"\
+    "Running under Python version "\
+    + str(sys.version.split()[0]) + "."\
+    "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
+    "\nAll rights reserved."
 
 args = parser.parse_args()
 
@@ -337,7 +340,7 @@ if sp != 0:
     sys.exit(1)
 
 # welcome msg
-welcome_msg = tool_version;
+welcome_msg = tool_version
 # if log file is set this will be logged
 utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
@@ -442,7 +445,7 @@ while done is False:
     elif state == "HANDLE_BINARIES":
         state = "DO_COPYFILES"
         if t.fetch_only_run():
-            continue;
+            continue
         binaries_path = root_path + "/binaries"
         t.do_get_binaries(binaries_path)
 
@@ -457,7 +460,7 @@ while done is False:
         bootimage = t.get_bootimage()
         generate_img = True
 
-        if not 'cmd' in bootimage.keys():
+        if 'cmd' not in bootimage.keys():
             generate_img = False
 
         if generate_img:
@@ -492,7 +495,7 @@ while done is False:
                         if os.path.isfile(f):
                             try:
                                 os.remove(f)
-                            except Exception as exp:
+                            except Exception as exc:
                                 utils.print_message(utils.logtype.WARNING,
                                                     "Failed to remove file",
                                                     f, ":", str(exc))
@@ -518,7 +521,8 @@ if done:
         utils.print_message(utils.logtype.INFO, line)
 
     if not t.fetch_only_run() and not utils.get_error_count:
-        utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
+        utils.print_message(utils.logtype.INFO, "Output directory: ./"
+                            + os.path.relpath(out_dir))
 
 if build_log_file is not None:
     build_log_file.close()

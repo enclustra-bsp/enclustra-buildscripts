@@ -130,7 +130,7 @@ class Target:
 
             if self.config.has_section("bootimage-required-files"):
                 for f in self.config['bootimage-required-files']:
-                    if self.config.getboolean('bootimage-required-files',f):
+                    if self.config.getboolean('bootimage-required-files', f):
                         files.append(f)
             if self.config.has_section("bootimage-required-files"):
                 for f in self.config['bootimage-result-files']:
@@ -184,7 +184,7 @@ class Target:
 
     def set_fetch(self, fetch):
         for target in fetch:
-            if not target in self.targets.keys():
+            if target not in self.targets.keys():
                 self.utils.print_message(self.utils.logtype.ERROR,
                                          "Target does not exist: ",
                                          target)
@@ -224,7 +224,7 @@ class Target:
 
     def set_build(self, build):
         for target in build:
-            if not target in self.targets.keys():
+            if target not in self.targets.keys():
                 self.utils.print_message(self.utils.logtype.ERROR,
                                          "Target does not exist: ",
                                          target)
@@ -480,7 +480,7 @@ class Target:
                                      "Copying binaries")
         # copy binaries
         for binary in self.binaries:
-            if not 'path' in self.binaries[binary].keys():
+            if 'path' not in self.binaries[binary].keys():
                 continue
             for outfile in (self.binaries[binary])["copy_files"]:
                 src = self.binaries[binary]["path"] + "/" + outfile[1]
