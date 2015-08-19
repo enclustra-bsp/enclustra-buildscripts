@@ -502,7 +502,6 @@ if done:
     utils.print_message(utils.logtype.INFO, "-" * 80)
     if utils.get_error_count():
         utils.print_message(utils.logtype.ERROR, "BUILD FAILED")
-        sys.exit(1)
     else:
         msg = "BUILD_SUCCEEDED"
         msg_type = utils.logtype.INFO
@@ -518,7 +517,7 @@ if done:
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
 
-    if not t.fetch_only_run():
+    if not t.fetch_only_run() and not utils.get_error_count:
         utils.print_message(utils.logtype.INFO, "Output directory: ./" + os.path.relpath( out_dir ) )
 
 if build_log_file is not None:
