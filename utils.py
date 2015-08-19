@@ -96,8 +96,8 @@ class Utils:
         print(textcolor + " ".join(str(i) for i in args) + self.bcolors.ENDC)
         
         if loglevel == self.logtype.ERROR:
-            print('\n')
             if self.break_on_error is True:
+                print('\n')
                 print("Break on error is set. Terminating run!")
                 sys.exit(1)
 
