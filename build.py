@@ -117,8 +117,8 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
 
 parser.add_argument("-c", "--clean-all", action='store_true',
                     required=False, dest='clean_all',
-                    help='Delete all the downloaded code, binaries, tools and'
-                    ' produced files')
+                    help='delete all downloaded code, binaries, tools and'
+                    ' built files')
 
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
