@@ -384,10 +384,11 @@ class Target:
         os.environ["PATH"] = toolchain_path + orig_path
 
         with self.utils.cd(custom_dir):
-            self.utils.call_tool(custom_cmd)
+            sp = self.utils.call_tool(custom_cmd)
 
         # restore original PATH
         os.environ["PATH"] = orig_path
+        return sp
 
     def fetch_only_run(self):
         for target in self.targets:
@@ -514,8 +515,11 @@ class Target:
         if generate_img:
             self.utils.print_message(self.utils.logtype.INFO,
                                 "Generating boot image")
-            # TODO: check errors
-            self.do_custom_cmd(toolchains_paths, directory, bootimage['cmd'])
+            sp = self.do_custom_cmd(toolchains_paths, directory, bootimage['cmd'])
+            if sp != 0:
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Error while generating bootimage")
+                generate_img = False
 
         if not generate_img:
             # if the image was not generated we need to delete previously
