@@ -237,6 +237,7 @@ elif args.device is not None:
             if binary[2] is True:
                 default = " (default)"
             print(str(count) + ". " + str(binary[0]) + default)
+            count += 1
         sys.exit(0)
 
     # divide targets into fetch/build groups
@@ -263,12 +264,17 @@ elif args.device is not None:
 
     if args.device_option is not None:
         binaries = t.get_binaries()
-        if int(args.device_option) > len(binaries):
+        index = int(args.device_option)
+        if index < 1:
             utils.print_message(utils.logtype.ERROR,
-                                "Chosen option exceeds available options",
+                                "Invalid device option.")
+            sys.exit(1)
+        elif index > len(binaries):
+            utils.print_message(utils.logtype.ERROR,
+                                "Chosen option exceeds available option",
                                 "count:", len(binaries))
             sys.exit(1)
-        chosen_bin = binaries[int(args.device_option) - 1]
+        chosen_bin = binaries[index-1]
         t.set_binaries(chosen_bin[0])
     else:
         # set the default one
