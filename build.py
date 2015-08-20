@@ -450,6 +450,7 @@ while done is False:
         t.do_get_binaries(binaries_path)
 
     elif state == "DO_COPYFILES":
+        utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
         out_dir = root_path + "/" + "out_" + t.get_name()
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
@@ -492,7 +493,7 @@ if done:
     for line in t.get_summary(oneline=True).split("\n"):
         utils.print_message(utils.logtype.INFO, line)
 
-    if not t.fetch_only_run() and not utils.get_error_count:
+    if not t.fetch_only_run() and not utils.get_error_count():
         utils.print_message(utils.logtype.INFO, "Output directory: ./"
                             + os.path.relpath(out_dir))
 
