@@ -550,7 +550,6 @@ class Target:
                                              "Error while copying file",
                                              src, ":", str(exc))
 
-
     def do_generate_image(self, directory, toolchains_paths):
         bootimage = self.get_bootimage()
         generate_img = True
@@ -569,7 +568,7 @@ class Target:
         # if dependancies are met
         if generate_img:
             self.utils.print_message(self.utils.logtype.INFO,
-                                "Generating boot image")
+                                     "Generating boot image")
             sp = self.do_custom_cmd(toolchains_paths, directory, bootimage['cmd'])
             if sp != 0:
                 self.utils.print_message(self.utils.logtype.ERROR,
@@ -587,9 +586,8 @@ class Target:
                                 os.remove(f)
                             except Exception as exc:
                                 self.utils.print_message(self.utils.logtype.WARNING,
-                                                    "Failed to remove file",
-                                                    f, ":", str(exc))
-
+                                                         "Failed to remove file",
+                                                         f, ":", str(exc))
 
     def get_summary(self, oneline=False):
         # decide which separator to use
