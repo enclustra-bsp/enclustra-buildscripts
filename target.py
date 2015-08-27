@@ -45,6 +45,7 @@ class Target:
         for target in self.config['targets']:
             target_descriptor = dict()
             target_build_commands = []
+            target_patches = []
             target_parallelbuild_commands = []
             target_copyfiles = []
             target_help = str(target)
@@ -71,6 +72,11 @@ class Target:
                                                          "-parallelbuild"]
                                                          [command])
 
+            if self.config.has_section(target + "-patches") is True:
+                for patch in self.config[target + "-patches"]:
+                    target_patches.append(self.config[str(target) +
+                                          "-patches"][patch])
+
             for copyfile in self.config[target + "-copyfiles"]:
                 target_copyfiles.append([copyfile, self.config[str(target) +
                                         "-copyfiles"][copyfile]])
@@ -90,6 +96,7 @@ class Target:
             target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
+            target_descriptor.update([("patches", target_patches)])
             target_descriptor.update([("build_commands",
                                      target_build_commands)])
             target_descriptor.update([("parallelbuild_commands",
@@ -334,6 +341,46 @@ class Target:
             # set build error
             (self.targets[target])["build_error"] = True
 
+    def apply_patch(self, target):
+        target_folder = self.master_repo_path + "/"\
+            + (self.targets[target])["repository"]
+        for patch in self.targets[target]["patches"]:
+            patch_path = target_folder + "/" + patch
+            # if the patch file is already in the target folder
+            # we assume that the sources has been already patched
+            if os.path.isfile(patch_path):
+                continue
+            # copy the patch file
+            try:
+                shutil.copyfile(self.config_path + "/" + patch,
+                                patch_path)
+            except Exception as exc:
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Error while copying patch file",
+                                         patch, "for the target",
+                                         str(target), ":", str(exc))
+                return 1
+            # pach the code
+            try:
+                with self.utils.cd(target_folder):
+                    call = "git --apply " + patch
+                    sp = self.utils.call_tool(call)
+                    if sp != 0:
+                        self.utils.print_message(self.utils.logtype.ERROR,
+                                                 "Error while patching target",
+                                                 str(target), "with patch",
+                                                 patch)
+                        return 1
+
+            except Exception as exc:
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Error while patching target",
+                                         str(target), "with patch",
+                                         patch, ":", str(exc))
+                return 1
+            # everything went OK
+            return 0
+
     def do_build(self, toolchains_paths, nthreads):
         for target in self.targets:
             if self.targets[target]["build"] is False:
@@ -345,6 +392,12 @@ class Target:
                 continue
             self.utils.print_message(self.utils.logtype.INFO, "Building",
                                      target)
+            if self.targets[target]["patches"] is not None:
+                if self.apply_patch(target) != 0:
+                    # if patching failed, do not build this target
+                    self.targets[target]["build"] = False
+                    self.targets[target]["build_error"] = True
+                    continue
 
             with self.utils.cd((self.master_repo_path + "/" +
                                (self.targets[target])["repository"])):
