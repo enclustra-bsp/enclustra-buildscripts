@@ -376,19 +376,20 @@ while done is False:
 
     elif state == "FETCH_MENU":
         code, tags = g.show_fetch_menu(t.get_fetch())
-        if code == "cancel":
+        if code in ("cancel", "esc"):
             state = "TARGET_MENU"
             g.step_out()
             continue
         else:
-            t.set_fetch(tags)
             if code == "ok":
+                t.set_fetch(tags)
                 state = "BUILD_MENU"
-            else:
+            elif code == "extra":
+                t.set_fetch(tags)
                 code, tags = g.show_fetch_opts_menu(t.get_fetch_opts())
                 if code == "ok":
                     t.set_fetch_opts(tags)
-                continue
+            continue
 
     elif state == "BUILD_MENU":
         code, tags = g.show_build_menu(t.get_build())
@@ -398,8 +399,9 @@ while done is False:
                 state = "BINARIES_MENU"
             else:
                 state = "SHOW_SUMMARY"
-        else:
+        elif code in ("cancel", "esc"):
             state = "FETCH_MENU"
+        continue
 
     elif state == "BINARIES_MENU":
         binaries = t.get_binaries()
@@ -412,18 +414,20 @@ while done is False:
         if code == "ok":
             t.set_binaries(tags)
             state = "SHOW_SUMMARY"
-        else:
+        elif code in ("cancel", "esc"):
             state = "BUILD_MENU"
+        continue
 
     elif state == "SHOW_SUMMARY":
         code = g.show_summary_menu(t.get_summary())
         if code == "ok":
             state = "DO_FETCH"
-        else:
+        elif code in ("cancel", "esc"):
             if not t.fetch_only_run():
                 state = "BINARIES_MENU"
             else:
                 state = "BUILD_MENU"
+        continue
 
     elif state == "DO_FETCH":
         # clear console
