@@ -378,8 +378,8 @@ class Target:
                                          str(target), "with patch",
                                          patch, ":", str(exc))
                 return 1
-            # everything went OK
-            return 0
+        # everything went OK
+        return 0
 
     def do_build(self, toolchains_paths, nthreads):
         for target in self.targets:
