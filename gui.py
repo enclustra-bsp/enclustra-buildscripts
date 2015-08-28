@@ -130,8 +130,7 @@ class Gui:
                                          item_help=True,
                                          cancel_label="Back")
         else:
-            return self.dialog.yesno("No target marked to fetch found!",
-                                     yes_label="OK", no_label="Cancel"), []
+            return self.dialog.msgbox("No target marked to fetch found!")
 
     def show_binaries_menu(self, menu_items):
         if len(menu_items) != 0:
@@ -139,8 +138,7 @@ class Gui:
                                          choices=menu_items,
                                          cancel_label="Back")
         else:
-            return self.dialog.yesno("No device options found!",
-                                     yes_label="OK", no_label="Cancel"), []
+            return self.dialog.msgbox("No device options found!")
 
     def show_fetch_opts_menu(self, menu_items):
         if len(menu_items) != 0:
@@ -148,8 +146,7 @@ class Gui:
                                          choices=menu_items,
                                          cancel_label="Back")
         else:
-            return self.dialog.yesno("No target marked to fetch found!",
-                                     yes_label="OK", no_label="Cancel"), []
+            return self.dialog.msgbox("No target marked to fetch found!")
 
     def show_build_menu(self, menu_items):
         if len(menu_items) != 0:
@@ -157,8 +154,7 @@ class Gui:
                                          choices=menu_items, item_help=True,
                                          cancel_label="Back")
         else:
-            return self.dialog.yesno("No target marked to build found!",
-                                     yes_label="OK", no_label="Cancel"), []
+            return self.dialog.msgbox("No target marked to build found!")
 
     def show_summary_menu(self, summary):
         # question shown to user
