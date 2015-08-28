@@ -89,14 +89,23 @@ class Gui:
             return (description, choices)
 
     def show_level_menu(self):
+        tagmap = dict()
         try:
             description, choices = self.get_choices()
         except:
             self.dialog.msgbox("Error while searching for available choices!")
             return "exit"
+
+        # substitute underscores with spaces but keep the key for later use
+        for choice in choices:
+            tagmap[choice[0].replace("_", " ")] = choice[0]
+            choice[0] = choice[0].replace("_", " ")
+
         code, tag = self.dialog.menu(description, choices=choices,
                                      cancel_label="Back")
         if code == self.dialog.OK:
+            # restore the original key from before underscore substitution
+            tag = tagmap[tag]
             self.step_in(tag)
             if self.bottom is True:
                 return "done"
