@@ -49,6 +49,7 @@ class Target:
             target_parallelbuild_commands = []
             target_copyfiles = []
             target_help = str(target)
+            target_helpbox = None
             target_disable = None
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
@@ -59,6 +60,9 @@ class Target:
                 if self.config.has_option(target + "-help",
                                           "description") is True:
                     target_help = self.config[target + "-help"]["description"]
+                if self.config.has_option(target + "-help",
+                                          "box") is True:
+                    target_helpbox = self.config[target + "-help"]["box"]
 
             if self.config.has_section(target + "-build") is True:
                 for command in self.config[target + "-build"]:
@@ -88,6 +92,7 @@ class Target:
                                              "-scripts"][script])])
 
             target_descriptor.update([("help", target_help)])
+            target_descriptor.update([("helpbox", target_helpbox)])
             target_descriptor.update([("disable", target_disable)])
             target_descriptor.update([("fetch", target_active)])
             target_descriptor.update([("disable_fetch", False)])
@@ -115,6 +120,11 @@ class Target:
                 download_uri = self.config[binary]["url"]
                 unpack = self.config.getboolean(binary, "unpack")
                 description = self.config[binary]["description"]
+                if self.config.has_option(binary, "helpbox"):
+                    helpbox = self.config[binary]["helpbox"]
+                else:
+                    helpbox = None
+
                 for copyfile in self.config[binary+"-copyfiles"]:
                     binary_copyfiles.append([copyfile,
                                              self.config[binary + "-copyfiles"]
@@ -122,6 +132,7 @@ class Target:
 
                 binary_descriptor.update([("default", is_default)])
                 binary_descriptor.update([("description", description)])
+                binary_descriptor.update([("helpbox", helpbox)])
                 binary_descriptor.update([("uri", download_uri)])
                 binary_descriptor.update([("unpack", unpack)])
                 binary_descriptor.update([("copy_files", binary_copyfiles)])
@@ -145,6 +156,15 @@ class Target:
                         result_files.append(f)
             self.bootimage['files'] = files
             self.bootimage['result_files'] = result_files
+
+    def get_target_helpbox(self, target):
+        return self.targets[target]["helpbox"]
+
+    def get_binary_helpbox(self, binary):
+        for b in self.binaries:
+            if self.binaries[b]["description"] == binary:
+                return self.binaries[b]["helpbox"]
+        return None
 
     def get_bootimage(self):
         return self.bootimage

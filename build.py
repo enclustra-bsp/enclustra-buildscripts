@@ -380,6 +380,9 @@ while done is False:
             state = "TARGET_MENU"
             g.step_out()
             continue
+        elif code == "help":
+            g.show_help(tags, t.get_target_helpbox(tags))
+            continue
         else:
             if code == "ok":
                 t.set_fetch(tags)
@@ -399,6 +402,9 @@ while done is False:
                 state = "BINARIES_MENU"
             else:
                 state = "SHOW_SUMMARY"
+        elif code == "help":
+            g.show_help(tags, t.get_target_helpbox(tags))
+            continue
         elif code in ("cancel", "esc"):
             state = "FETCH_MENU"
         continue
@@ -414,6 +420,9 @@ while done is False:
         if code == "ok":
             t.set_binaries(tags)
             state = "SHOW_SUMMARY"
+        elif code == "help":
+            g.show_help(tags, t.get_binary_helpbox(tags))
+            continue
         elif code in ("cancel", "esc"):
             state = "BUILD_MENU"
         continue

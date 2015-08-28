@@ -128,6 +128,8 @@ class Gui:
                                          choices=menu_items, extra_button=True,
                                          extra_label="Advanced",
                                          item_help=True,
+                                         help_button=True,
+                                         help_tags=True,
                                          cancel_label="Back")
         else:
             return self.dialog.msgbox("No target marked to fetch found!")
@@ -136,6 +138,8 @@ class Gui:
         if len(menu_items) != 0:
             return self.dialog.radiolist("Choose the device option.",
                                          choices=menu_items,
+                                         help_button=True,
+                                         help_tags=True,
                                          cancel_label="Back")
         else:
             return self.dialog.msgbox("No device options found!")
@@ -151,10 +155,20 @@ class Gui:
     def show_build_menu(self, menu_items):
         if len(menu_items) != 0:
             return self.dialog.checklist("Which targets do you want to build?",
-                                         choices=menu_items, item_help=True,
+                                         choices=menu_items,
+                                         item_help=True,
+                                         help_button=True,
+                                         help_tags=True,
                                          cancel_label="Back")
         else:
             return self.dialog.msgbox("No target marked to build found!")
+
+    def show_help(self, target, help_msg):
+        if help_msg:
+            msg = help_msg
+        else:
+            msg = "No help message for " + target
+        return self.dialog.msgbox(msg, 15, 60)
 
     def show_summary_menu(self, summary):
         # question shown to user
