@@ -207,6 +207,24 @@ class Target:
                 build_opts.append([subt['name'], "", subt['enabled']])
         return build_opts
 
+    def get_subtargets(self, target):
+        build_opts = []
+
+        if (self.targets[target])["build"] is True:
+            for subt in (self.targets[target])["parallelbuild_commands"]:
+                build_opts.append(subt['name'])
+
+        return build_opts
+
+    def validate_subtargets(self, subtargets):
+        invalid = []
+        invalid.extend(subtargets)
+        for target in self.targets:
+            for c in (self.targets[target])["parallelbuild_commands"]:
+                if c['name'] in subtargets:
+                    invalid.remove(c['name'])
+        return invalid
+
     def set_build_opts(self, build_opts):
         for target in self.targets:
             if (self.targets[target])["build"] is False:

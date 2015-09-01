@@ -106,6 +106,11 @@ parser.add_argument("-b", "--build", action='append', required=False,
                     dest='target_build', metavar='target',
                     help='build specific target')
 
+parser.add_argument("--custom-build", action='append', required=False, nargs=2,
+                    dest='custom_target_build', metavar=('target', 'steps'),
+                    help='build specific target with specific steps, separate '
+                    'steps using coma')
+
 parser.add_argument("--fetch-history", action='append', required=False,
                     dest='fetch_history', metavar='target',
                     help='fetch specific target with history')
@@ -250,6 +255,7 @@ elif args.device is not None:
     # divide targets into fetch/build groups
     fetch_group = []
     build_group = []
+    build_opts = []
 
     if args.target is not None:
         fetch_group.extend(args.target)
@@ -259,16 +265,35 @@ elif args.device is not None:
         fetch_group.extend(args.target_fetch)
 
     if args.target_build is not None:
-        build_group.extend(args.target_build)
+        build_group.extend(args.target_fetch)
 
     if args.fetch_history is not None:
         fetch_group.extend(args.fetch_history)
         t.set_fetch_opts(args.fetch_history)
 
+    if args.custom_target_build is not None:
+        for target in args.custom_target_build:
+            if len(target) > 1:
+                for st in target[1].split(','):
+                    build_opts.append(target[0] + " " + st)
+            else:
+                build_opts.extend(t.get_subtargets(target[0]))
+
+            build_group.append(target[0])
+
     if fetch_group or build_group:
         t.set_fetch(fetch_group)
         t.set_build(build_group)
     # else: build all default targets
+
+    invalid_targets = t.validate_subtargets(build_opts)
+    if len(invalid_targets) > 0:
+        utils.print_message(utils.logtype.ERROR,
+                            "Invalid targets specified:",
+                            ', '.join(invalid_targets))
+        sys.exit(1)
+
+    t.set_build_opts(build_opts)
 
     if args.device_option is not None:
         binaries = t.get_binaries()
