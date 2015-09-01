@@ -416,6 +416,12 @@ while done is False:
         elif code == "help":
             g.show_help(tags, t.get_target_helpbox(tags))
             continue
+        elif code == "extra":
+            t.set_build(tags)
+            code, subtags = g.show_build_opts_menu(t.get_build_opts())
+            if code == "ok":
+                t.set_build_opts(subtags)
+                continue
         elif code in ("cancel", "esc"):
             state = "FETCH_MENU"
         continue

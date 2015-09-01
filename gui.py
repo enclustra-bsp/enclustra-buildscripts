@@ -161,10 +161,20 @@ class Gui:
         else:
             return self.dialog.msgbox("No target marked to fetch found!")
 
+    def show_build_opts_menu(self, menu_items):
+        if len(menu_items) != 0:
+            return self.dialog.checklist("Enable specific building steps",
+                                         choices=menu_items,
+                                         cancel_label="Back")
+        else:
+            return self.dialog.msgbox("No target marked to build found!")
+
     def show_build_menu(self, menu_items):
         if len(menu_items) != 0:
             return self.dialog.checklist("Which targets do you want to build?",
                                          choices=menu_items,
+                                         extra_button=True,
+                                         extra_label="Advanced",
                                          item_help=True,
                                          help_button=True,
                                          help_tags=True,

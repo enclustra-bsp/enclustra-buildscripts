@@ -71,10 +71,13 @@ class Target:
 
             if self.config.has_section(target + "-parallelbuild") is True:
                 for command in self.config[target + "-parallelbuild"]:
-                    target_parallelbuild_commands.append(self.config[
-                                                         str(target) +
-                                                         "-parallelbuild"]
-                                                         [command])
+                    subtarget = dict()
+                    subtarget['name'] = target + " " + command
+                    subtarget['cmd'] = self.config[str(target) +
+                                                   "-parallelbuild"][command]
+                    subtarget['enabled'] = True
+
+                    target_parallelbuild_commands.append(subtarget)
 
             if self.config.has_section(target + "-patches") is True:
                 for patch in self.config[target + "-patches"]:
@@ -193,6 +196,23 @@ class Target:
     def set_fetch_opts(self, fetch_opts):
         for target in self.targets:
             (self.targets[target])["history"] = target in fetch_opts
+
+    def get_build_opts(self):
+        build_opts = []
+
+        for target in self.targets:
+            if (self.targets[target])["build"] is False:
+                continue
+            for subt in (self.targets[target])["parallelbuild_commands"]:
+                build_opts.append([subt['name'], "", subt['enabled']])
+        return build_opts
+
+    def set_build_opts(self, build_opts):
+        for target in self.targets:
+            if (self.targets[target])["build"] is False:
+                continue
+            for c in (self.targets[target])["parallelbuild_commands"]:
+                c['enabled'] = c['name'] in build_opts
 
     def get_fetch(self):
         fetch = []
@@ -429,8 +449,9 @@ class Target:
                 os.environ["PATH"] = toolchain_path + orig_path
 
                 # build parallel targets
-                for command in (self.targets[target])["parallelbuild_commands"]:
-                    self.call_build_tool(command, target, nthreads)
+                for subt in (self.targets[target])["parallelbuild_commands"]:
+                    if subt['enabled']:
+                        self.call_build_tool(subt['cmd'], target, nthreads)
 
                 # build targets
                 for command in (self.targets[target])["build_commands"]:
