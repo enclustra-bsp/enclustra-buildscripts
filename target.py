@@ -639,6 +639,8 @@ class Target:
             # check if target is to be fetched
             if self.targets[t]["fetch"]:
                 current_target_line += "fetch"
+                if self.targets[t]["history"]:
+                    current_target_line += " \w history"
 
             # add plus sign if target is to be both fetched and built
             if self.targets[t]["build"] and self.targets[t]["fetch"]:
