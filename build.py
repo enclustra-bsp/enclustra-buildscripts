@@ -54,7 +54,7 @@ except ImportError as e:
 registered_toolchains = dict()
 
 master_repo_name = "sources"
-root_path = os.getcwd()
+root_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
 done = False
@@ -135,7 +135,7 @@ parser.add_argument("-v", "--version", action='store_true', required=False,
 
 # process main config
 config = configparser.ConfigParser()
-if config.read("enclustra.ini") is None:
+if config.read(root_path + "/enclustra.ini") is None:
     utils.print_message(utils.logtype.ERROR, "Configuration file not found!")
     sys.exit(1)
 try:
@@ -150,7 +150,7 @@ try:
     if config.has_option('debug', 'build-logfile'):
         build_log = config['debug']['build-logfile']
         try:
-            build_log_file = open(build_log, 'w')
+            build_log_file = open(root_path + '/' + build_log, 'w')
         except Exception as ext:
             utils.print_message(utils.logtype.WARNING, "Could not open file",
                                 build_log, "for writing. Error:", str(ext))
@@ -166,7 +166,7 @@ except Exception as ext:
     sys.exit(1)
 
 
-revision = utils.get_git_revision().rstrip('\n')
+revision = utils.get_git_revision(root_path).rstrip('\n')
 tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
@@ -210,10 +210,10 @@ elif args.device is not None:
 
     # check if user wants to list subdirs for the given device
     if args.list_devices:
-        utils.list_devices(entry_point=args.device)
+        utils.list_devices(root_path, entry_point=args.device)
         sys.exit(0)
     elif args.list_devices_raw:
-        utils.list_devices_raw(entry_point=args.device)
+        utils.list_devices_raw(root_path, entry_point=args.device)
         sys.exit(0)
 
     # check if it is a bottom dir
@@ -324,10 +324,10 @@ elif args.device is not None:
 
     state = "DO_FETCH"
 elif args.list_devices is True:
-    utils.list_devices()
+    utils.list_devices(root_path)
     sys.exit(0)
 elif args.list_devices_raw:
-    utils.list_devices_raw()
+    utils.list_devices_raw(root_path)
     sys.exit(0)
 elif len(sys.argv) > 1:
     print(str("Specify the device to use the following arguments: " +
@@ -379,7 +379,7 @@ if pull is True:
         sp = utils.call_tool(call)
 # clone new
 else:
-    call = "git clone " + manifest_repo + " " + master_repo_name
+    call = "git clone " + manifest_repo + " " + master_repo_path
     sp = utils.call_tool(call)
 if sp != 0:
     utils.print_message(utils.logtype.ERROR,

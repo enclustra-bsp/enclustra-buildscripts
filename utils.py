@@ -115,12 +115,13 @@ class Utils:
         proc.wait()
         return proc.returncode
 
-    def get_git_revision(self):
+    def get_git_revision(self, root_path):
         call = "git rev-parse --short HEAD"
-        try:
-            revision = subprocess.check_output(shlex.split(call))
-        except:
-            revision = "unknown"
+        with self.cd(root_path):
+            try:
+                revision = subprocess.check_output(shlex.split(call))
+            except:
+                revision = "unknown"
         return revision
 
     def run_post_script(self, state, target, boardpath, master_repo_path):
@@ -220,19 +221,19 @@ class Utils:
         minimal = self.splittedname(minimal_version)
         return local >= minimal
 
-    def list_devices_raw(self, entry_point=""):
-        for root, dirs, files in os.walk("targets/" + entry_point):
+    def list_devices_raw(self, root_path, entry_point=""):
+        for root, dirs, files in os.walk(root_path + "/targets/" + entry_point):
             if root == "targets" + entry_point:
                 continue
             if len(dirs) == 0:
                 # remove the leading targets catalog
-                root = root.replace("targets/", '')
+                root = root.replace(root_path + "/targets/", '')
                 # make the spaces copy-pasteable
                 print(root)
 
-    def list_devices(self, entry_point=""):
+    def list_devices(self, root_path, entry_point=""):
         print(str("List of available devices:"))
-        self.list_devices_raw(entry_point)
+        self.list_devices_raw(root_path, entry_point)
 
     class cd:
         """Context manager for changing the current working directory"""
