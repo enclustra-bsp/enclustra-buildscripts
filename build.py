@@ -233,11 +233,16 @@ elif args.device is not None:
     if args.list_targets is True:
         targets_list = t.get_fetch()
         print(str("Available targets for " + args.device + ":"))
-        print(str("Default targets are marked with an (*)"))
+        print(str("Default targets are marked with an [*]"))
         for tgt in targets_list:
-                if tgt[2] is True:
-                    tgt[0] = tgt[0] + " (*)"
-                print(str(tgt[0]))
+            subs = []
+            for st in t.get_subtargets(tgt[0]):
+                subs.append(st.split(' ')[1])
+            subs = ', '.join(subs)
+            tgt[0] = tgt[0] + ' (' + subs + ')'
+            if tgt[2] is True:
+                tgt[0] = tgt[0] + " [*]"
+            print(str(tgt[0]))
         sys.exit(0)
 
     if args.list_dev_options is True:
