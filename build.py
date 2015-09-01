@@ -81,6 +81,10 @@ parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
                     help='list all available devices')
 
+parser.add_argument("--list-devices-raw", action='store_true',
+                    required=False, dest='list_devices_raw',
+                    help='list all available devices in a script friendly way')
+
 parser.add_argument("-d", "--device", action='store', required=False,
                     dest='device', metavar='device',
                     help='specify device as follows: \
@@ -203,6 +207,9 @@ elif args.device is not None:
     if args.list_devices:
         utils.list_devices(entry_point=args.device)
         sys.exit(0)
+    elif args.list_devices_raw:
+        utils.list_devices_raw(entry_point=args.device)
+        sys.exit(0)
 
     # check if it is a bottom dir
     bottom = len([n for n in os.listdir(dev_path)
@@ -287,6 +294,9 @@ elif args.device is not None:
     state = "DO_FETCH"
 elif args.list_devices is True:
     utils.list_devices()
+    sys.exit(0)
+elif args.list_devices_raw:
+    utils.list_devices_raw()
     sys.exit(0)
 elif len(sys.argv) > 1:
     print(str("Specify the device to use the following arguments: " +

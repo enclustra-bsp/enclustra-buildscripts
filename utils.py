@@ -220,8 +220,7 @@ class Utils:
         minimal = self.splittedname(minimal_version)
         return local >= minimal
 
-    def list_devices(self, entry_point=""):
-        print(str("List of available devices:"))
+    def list_devices_raw(self, entry_point=""):
         for root, dirs, files in os.walk("targets/" + entry_point):
             if root == "targets" + entry_point:
                 continue
@@ -229,7 +228,11 @@ class Utils:
                 # remove the leading targets catalog
                 root = root.replace("targets/", '')
                 # make the spaces copy-pasteable
-                print("\"" + root + "\"")
+                print(root)
+
+    def list_devices(self, entry_point=""):
+        print(str("List of available devices:"))
+        self.list_devices_raw(entry_point)
 
     class cd:
         """Context manager for changing the current working directory"""
