@@ -261,13 +261,14 @@ elif args.device is not None:
     if args.target_build is not None:
         build_group.extend(args.target_build)
 
+    if args.fetch_history is not None:
+        fetch_group.extend(args.fetch_history)
+        t.set_fetch_opts(args.fetch_history)
+
     if fetch_group or build_group:
         t.set_fetch(fetch_group)
         t.set_build(build_group)
     # else: build all default targets
-
-    if args.fetch_history is not None:
-        t.set_fetch_opts(args.fetch_history)
 
     if args.device_option is not None:
         binaries = t.get_binaries()
