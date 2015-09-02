@@ -29,7 +29,7 @@ class Target:
         self.toolchains = []
         self.targets = dict()
         self.binaries = dict()
-        self.bootimage = dict()
+        self.bootimages = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
@@ -145,20 +145,22 @@ class Target:
 
         # get bootimage info
         if self.config.has_section("bootimage"):
-            self.bootimage['cmd'] = self.config['bootimage']['bootimage']
-            files = []
-            result_files = []
+            for k in self.config['bootimage']:
+                self.bootimages[k] = dict()
+                self.bootimages[k]['cmd'] = self.config['bootimage'][k]
+                files = []
+                result_files = []
 
-            if self.config.has_section("bootimage-required-files"):
-                for f in self.config['bootimage-required-files']:
-                    if self.config.getboolean('bootimage-required-files', f):
-                        files.append(f)
-            if self.config.has_section("bootimage-required-files"):
-                for f in self.config['bootimage-result-files']:
-                    if self.config.getboolean('bootimage-result-files', f):
-                        result_files.append(f)
-            self.bootimage['files'] = files
-            self.bootimage['result_files'] = result_files
+                if self.config.has_section(k + "-required-files"):
+                    for f in self.config[k + '-required-files']:
+                        if self.config.getboolean(k + '-required-files', f):
+                            files.append(f)
+                if self.config.has_section(k + "-required-files"):
+                    for f in self.config[k +'-result-files']:
+                        if self.config.getboolean(k + '-result-files', f):
+                            result_files.append(f)
+                self.bootimages[k]['files'] = files
+                self.bootimages[k]['result_files'] = result_files
 
     def get_target_helpbox(self, target):
         return self.targets[target]["helpbox"]
@@ -169,8 +171,8 @@ class Target:
                 return self.binaries[b]["helpbox"]
         return None
 
-    def get_bootimage(self):
-        return self.bootimage
+    def get_bootimages(self):
+        return self.bootimages
 
     def get_binaries(self):
         binaries = []
@@ -610,43 +612,52 @@ class Target:
                                              src, ":", str(exc))
 
     def do_generate_image(self, directory, toolchains_paths):
-        bootimage = self.get_bootimage()
-        generate_img = True
+        bootimages = self.get_bootimages()
 
-        # there is no bootimage to build
-        if 'cmd' not in bootimage.keys():
-            return
+        for k in bootimages.keys():
+            generate_img = True
+            # there is no bootimage to build
+            if 'cmd' not in bootimages[k].keys():
+                return
 
-        # check if every required file is accessible
-        with self.utils.cd(directory):
-            for f in bootimage['files']:
-                if not os.path.isfile(f):
+            # check if every required file is accessible
+            with self.utils.cd(directory):
+                for f in bootimages[k]['files']:
+                    if not os.path.isfile(f):
+                        generate_img = False
+                        break
+
+            # if dependancies are met
+            if generate_img:
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         "Generating boot image")
+                sp = self.do_custom_cmd(toolchains_paths,
+                                        directory,
+                                        bootimages[k]['cmd'])
+                if sp != 0:
+                    self.utils.print_message(self.utils.logtype.ERROR,
+                                            "Error generating bootimage:",
+                                            k)
                     generate_img = False
-                    break
 
-        # if dependancies are met
-        if generate_img:
-            self.utils.print_message(self.utils.logtype.INFO,
-                                     "Generating boot image")
-            sp = self.do_custom_cmd(toolchains_paths, directory, bootimage['cmd'])
-            if sp != 0:
-                self.utils.print_message(self.utils.logtype.ERROR,
-                                         "Error while generating bootimage")
-                generate_img = False
+            if generate_img:
+                continue
 
-        if not generate_img:
             # if the image was not generated we need to delete previously
             # generated files
             with self.utils.cd(directory):
-                if 'result_files' in bootimage.keys():
-                    for f in bootimage['result_files']:
-                        if os.path.isfile(f):
-                            try:
-                                os.remove(f)
-                            except Exception as exc:
-                                self.utils.print_message(self.utils.logtype.WARNING,
-                                                         "Failed to remove file",
-                                                         f, ":", str(exc))
+                if 'result_files' not in bootimages[k].keys():
+                    continue
+                for f in bootimages[k]['result_files']:
+                    if not os.path.isfile(f):
+                        continue
+
+                    try:
+                        os.remove(f)
+                    except Exception as exc:
+                        self.utils.print_message(self.utils.logtype.WARNING,
+                                                 "Failed to remove file",
+                                                 f, ":", str(exc))
 
     def get_summary(self, oneline=False):
         # decide which separator to use
