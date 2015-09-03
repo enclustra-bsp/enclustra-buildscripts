@@ -108,8 +108,8 @@ parser.add_argument("-b", "--build", action='append', required=False,
 
 parser.add_argument("--custom-build", action='append', required=False, nargs=2,
                     dest='custom_target_build', metavar=('target', 'steps'),
-                    help='build specific target with specific steps, separate '
-                    'steps using coma')
+                    help='build specific target with specific steps'
+                    ' (comma separated)')
 
 parser.add_argument("--fetch-history", action='append', required=False,
                     dest='fetch_history', metavar='target',
