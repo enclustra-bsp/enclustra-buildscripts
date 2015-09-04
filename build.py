@@ -94,6 +94,11 @@ parser.add_argument("-l", "--list-targets", action='store_true', required=False,
                     dest='list_targets',
                     help='list all targets for chosen device')
 
+parser.add_argument("--list-targets-raw", action='store_true', required=False,
+                    dest='list_targets_raw',
+                    help='list all targets for chosen device in a script'
+                    ' friendly way')
+
 parser.add_argument("-x",  action='append', required=False,
                     dest='target', metavar='target',
                     help='fetch and build specific target')
@@ -242,6 +247,16 @@ elif args.device is not None:
             tgt[0] = tgt[0] + ' (' + subs + ')'
             if tgt[2] is True:
                 tgt[0] = tgt[0] + " [*]"
+            print(str(tgt[0]))
+        sys.exit(0)
+    elif args.list_targets_raw is True:
+        targets_list = t.get_fetch()
+        for tgt in targets_list:
+            subs = []
+            for st in t.get_subtargets(tgt[0]):
+                subs.append(st.split(' ')[1])
+            subs = ','.join(subs)
+            tgt[0] = tgt[0] + ' ' + subs
             print(str(tgt[0]))
         sys.exit(0)
 
