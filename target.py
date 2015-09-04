@@ -129,6 +129,11 @@ class Target:
                     shortname = self.config[binary]["shortname"]
                 else:
                     shortname = binary
+                if self.config.has_option(binary, "force_download"):
+                    redownload = self.config.getboolean(binary,
+                                                        "force_download")
+                else:
+                    redownload = False
                 unpack = self.config.getboolean(binary, "unpack")
                 description = self.config[binary]["description"]
                 if self.config.has_option(binary, "helpbox"):
@@ -146,6 +151,7 @@ class Target:
                 binary_descriptor.update([("helpbox", helpbox)])
                 binary_descriptor.update([("uri", download_uri)])
                 binary_descriptor.update([("unpack", unpack)])
+                binary_descriptor.update([("redownload", redownload)])
                 binary_descriptor.update([("shortname", shortname)])
                 binary_descriptor.update([("copy_files", binary_copyfiles)])
                 binary_descriptor.update([("chosen", False)])
@@ -538,15 +544,19 @@ class Target:
                 continue
             # download binary
             binary_file = os.path.basename(self.binaries[binary]["uri"])
-            if os.path.isfile(download_path + "/" + binary_file) is False:
-                call = "wget " + self.binaries[binary]["uri"]
-                with self.utils.cd(download_path):
-                    sp = self.utils.call_tool(call)
-                if sp != 0:
-                    self.utils.print_message(self.utils.logtype.ERROR,
-                                             "Error while downloading",
-                                             binary, "binary")
-                    continue
+            call = "wget "
+            if self.binaries[binary]["redownload"] is False:
+                call = call + "-N "
+            elif os.path.isfile(download_path + "/" + binary_file):
+                os.remove(download_path + "/" + binary_file)
+            call = call + self.binaries[binary]["uri"]
+            with self.utils.cd(download_path):
+                sp = self.utils.call_tool(call)
+            if sp != 0:
+                self.utils.print_message(self.utils.logtype.ERROR,
+                                         "Error while downloading",
+                                         binary, "binary")
+                continue
             # unpack binary (if required)
             if self.binaries[binary]["unpack"] is True:
                 with self.utils.cd(download_path):
