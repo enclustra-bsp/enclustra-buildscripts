@@ -574,7 +574,7 @@ class Target:
                                                  "Copying ./" + os.path.relpath(src) +
                                                  " to ./" + os.path.relpath(dst))
                     except Exception as exc:
-                        self.utils.print_message(self.utils.logtype.WARNING,
+                        self.utils.print_message(self.utils.logtype.ERROR,
                                                  "Error while copying file",
                                                  src, ":", str(exc))
 
