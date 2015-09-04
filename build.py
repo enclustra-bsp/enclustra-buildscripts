@@ -64,7 +64,7 @@ tool_name = "Enclustra Build Environment"
 required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
                   ["tar",    "--version", 4, "1.15"],
-                  ["wget",   "--version", 3, "1.0"],
+                  ["wget",   "--version", 3, "1.4"],
                   ["gcc",    "--version", 3, "4.8.3"],
                   ["g++",    "--version", 3, "4.8.3"],
                   ["patch",  "--version", 3, "2.7.1"])
