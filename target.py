@@ -32,6 +32,10 @@ class Target:
         self.bootimages = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
+        binary_keys = self.binaries.keys()
+        if len(binary_keys) > 0:
+            self.target_name = self.target_name + "_" + \
+                    self.binaries[binary_keys[0]]['shortname']
         self.debug_calls = debug_calls
         self.utils = utils
 
@@ -121,6 +125,10 @@ class Target:
 
                 is_default = self.config.getboolean("binaries", binary)
                 download_uri = self.config[binary]["url"]
+                if self.config.has_option(binary, "shortname"):
+                    shortname = self.config[binary]["shortname"]
+                else:
+                    shortname = binary
                 unpack = self.config.getboolean(binary, "unpack")
                 description = self.config[binary]["description"]
                 if self.config.has_option(binary, "helpbox"):
@@ -138,6 +146,7 @@ class Target:
                 binary_descriptor.update([("helpbox", helpbox)])
                 binary_descriptor.update([("uri", download_uri)])
                 binary_descriptor.update([("unpack", unpack)])
+                binary_descriptor.update([("shortname", shortname)])
                 binary_descriptor.update([("copy_files", binary_copyfiles)])
                 binary_descriptor.update([("chosen", False)])
 
