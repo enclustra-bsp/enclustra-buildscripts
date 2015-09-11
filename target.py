@@ -33,14 +33,21 @@ class Target:
         self.parse_init_file()
         self.target_name = str(target_name)
         binary_keys = self.binaries.keys()
-        if len(binary_keys) > 0:
-            self.target_name = self.target_name + "_" + \
-                    self.binaries[binary_keys[0]]['shortname']
         self.debug_calls = debug_calls
         self.utils = utils
 
     def get_name(self):
         return self.target_name
+
+    def get_fullname(self):
+        for b in self.binaries:
+            if self.binaries[b]['chosen'] is False:
+                continue
+            return self.get_name() + "_" + self.binaries[b]['shortname']
+        return self.get_name()
+
+    def get_out_dir(self, root_path):
+        return root_path + "/" + "out_" + self.get_fullname()
 
     def parse_init_file(self):
         for toolchain in self.config['toolchains']:

@@ -532,13 +532,13 @@ while done is False:
 
     elif state == "DO_COPYFILES":
         utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
-        out_dir = root_path + "/" + "out_" + t.get_name()
+        out_dir = t.get_out_dir(root_path)
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        out_dir = root_path + "/" + "out_" + t.get_name()
+        out_dir = t.get_out_dir(root_path)
 
         required_toolchains = t.get_required_toolchains()
         try:
