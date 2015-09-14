@@ -62,8 +62,12 @@ class Target:
             target_help = str(target)
             target_helpbox = None
             target_disable = None
+            target_branch = None
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
+
+            if self.config.has_option(target, "branch") is True:
+                target_branch = self.config[target]["branch"]
 
             if self.config.has_option(target, "disables") is True:
                 target_disable = self.config[target]["disables"]
@@ -115,6 +119,7 @@ class Target:
             target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
+            target_descriptor.update([("branch", target_branch)])
             target_descriptor.update([("patches", target_patches)])
             target_descriptor.update([("build_commands",
                                      target_build_commands)])
@@ -381,9 +386,30 @@ class Target:
                 self.utils.print_message(self.utils.logtype.WARNING,
                                          "Fetching for", target, "failed")
                 continue
-            else:
-                self.utils.print_message(self.utils.logtype.OK, "Target",
-                                         target, "fetched")
+
+            # Switch branch if specified
+            if (self.targets[target])["branch"] is not None:
+                call = "git fetch " + depth + " origin " + \
+                       (self.targets[target])["branch"]
+
+                repo_dir = self.master_repo_path + "/" + \
+                           str((self.targets[target])["repository"])
+
+                with self.utils.cd(repo_dir):
+                    sp = self.utils.call_tool(call)
+                call = "git checkout FETCH_HEAD"
+                if sp == 0:
+                    with self.utils.cd(repo_dir):
+                        sp = self.utils.call_tool(call)
+            if sp != 0:
+                # if fetching failed unmark this target from building
+                (self.targets[target])["build"] = False
+                self.utils.print_message(self.utils.logtype.WARNING,
+                                         "Fetching for", target, "failed")
+                continue
+
+            self.utils.print_message(self.utils.logtype.OK, "Target",
+                                     target, "fetched")
 
             # if there is postfetch custom script
             if "postfetch" in self.targets[target]:
