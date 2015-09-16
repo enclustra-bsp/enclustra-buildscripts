@@ -232,7 +232,7 @@ elif args.device is not None:
         sys.exit(1)
 
     device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
-    t = target.Target(master_repo_path, dev_path, ini_files,
+    t = target.Target(root_path, master_repo_path, dev_path, ini_files,
                       device_name, debug_calls, utils)
     # if list only
     if args.list_targets is True:
@@ -409,10 +409,51 @@ utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 # Main loop
 g = None
 while done is False:
+    used_previous_config = False
     if state == "INIT":
         g = gui.Gui(root_path+"/targets")
         g.show_welcome_screen(welcome_msg)
-        state = "TARGET_MENU"
+
+        history_path = root_path + "/.history/"
+
+        if os.path.exists(history_path) and os.listdir(history_path):
+            state = "HISTORY_MENU"
+        else:
+            state = "TARGET_MENU"
+
+    if state == "HISTORY_MENU":
+        cfg = []
+        prev_cfg = os.listdir(root_path + "/.history")
+        for c in prev_cfg:
+            cfg.append((c, ""))
+
+        code, tag = g.show_previous_configs(sorted(cfg))
+        if code == "ok":
+            if tag == g.new_config_tag:
+                state = "TARGET_MENU"
+            else:
+                used_previous_config = True
+                # initialize target
+                t = target.Target(root_path, master_repo_path, g.get_workdir(),
+                                  root_path + "/.history/" + tag,
+                                  "No name", debug_calls, utils)
+
+                # binaries have to be set by hand
+                if t.config.has_section("binaries") is True:
+                    for b in t.config["binaries"]:
+                        if t.config.getboolean("binaries", b):
+                            t.set_binaries(t.config[b]["description"])
+                            break
+
+                # set the project name
+                t.target_name = t.config["project"]["name"]
+                # set config path
+                t.config_path = t.config["project"]["path"]
+
+                state = "SHOW_SUMMARY"
+        else:
+            subprocess.call("clear")
+            sys.exit(0)
 
     if state == "TARGET_MENU":
         # show main menu
@@ -426,7 +467,7 @@ while done is False:
         elif code == "done":
             state = "FETCH_MENU"
             # initialize target
-            t = target.Target(master_repo_path, g.get_workdir(),
+            t = target.Target(root_path, master_repo_path, g.get_workdir(),
                               g.get_inifiles(), g.get_target_name(),
                               debug_calls, utils)
 
@@ -490,17 +531,22 @@ while done is False:
         continue
 
     elif state == "SHOW_SUMMARY":
-        code = g.show_summary_menu(t.get_summary())
+        code = g.show_summary_menu(t.get_summary(), used_previous_config)
         if code == "ok":
             state = "DO_FETCH"
         elif code in ("cancel", "esc"):
-            if not t.fetch_only_run():
+            if used_previous_config is True:
+                state = "FETCH_MENU"
+            elif not t.fetch_only_run():
                 state = "BINARIES_MENU"
             else:
                 state = "BUILD_MENU"
         continue
 
     elif state == "DO_FETCH":
+        # save config
+        t.save_config()
+
         # clear console
         if g:
             subprocess.call("clear")

@@ -29,9 +29,22 @@ class Gui:
         self.top = True
         self.bottom = False
         self.inifiles = list()
+        self.new_config_tag = "New configuration..."
 
     def show_welcome_screen(self, msg):
         self.dialog.msgbox(msg, width=80)
+
+    def show_previous_configs(self, configs):
+        configs = [(self.new_config_tag, "")] + configs
+
+        width = 80
+        for text in configs:
+            if len(text) + 16 > width:
+                width = len(text) + 16
+        return self.dialog.menu("Choose configuration",
+                                choices=configs,
+                                width = width,
+                                cancel_label="Exit")
 
     def step_in(self, directory):
         if self.check_bottom_level() is False:
@@ -189,7 +202,7 @@ class Gui:
             msg = "No help message for " + target
         return self.dialog.msgbox(msg, 15, 60)
 
-    def show_summary_menu(self, summary):
+    def show_summary_menu(self, summary, used_previous_config):
         # question shown to user
         w_question = "Please verify all the chosen parameters"
         w_text = "%s\n\n%s" % (w_question, summary)
@@ -198,5 +211,10 @@ class Gui:
         w_height = w_text.count("\n") + 6  # num of lines + 6 for frame/buttons
         w_width = len((max(w_text.split("\n"), key=len))) + 4  # 4 is the frame
 
+        if used_previous_config is True:
+            back_label = "Customize"
+        else:
+            back_label = "Back"
+
         return self.dialog.yesno(w_text, w_height, w_width,
-                                 yes_label="Proceed", no_label="Back")
+                                 yes_label="Proceed", no_label=back_label)

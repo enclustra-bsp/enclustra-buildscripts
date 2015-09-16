@@ -8,3 +8,4 @@ out_*
 sources
 binaries
 *.log
+.history

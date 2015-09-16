@@ -16,13 +16,15 @@ import os
 import sys
 import shutil
 import archive
+import time
 
 
 class Target:
-    def __init__(self, master_repo_path, config_path, ini_files, target_name,
-                 debug_calls, utils):
+    def __init__(self, root_path, master_repo_path, config_path, ini_files,
+                 target_name, debug_calls, utils):
         self.config = configparser.ConfigParser()
         self.config.optionxform = str
+        self.root_path = root_path
         self.master_repo_path = master_repo_path
         self.config_path = config_path
         self.config.read(ini_files)
@@ -35,6 +37,59 @@ class Target:
         binary_keys = self.binaries.keys()
         self.debug_calls = debug_calls
         self.utils = utils
+
+    def save_config(self):
+        for t in self.targets:
+            key = t + "-options"
+            if self.config.has_section(key) is False:
+                self.config.add_section(key)
+
+            self.config.set(key, "fetch", str(self.targets[t]["fetch"]))
+            self.config.set(key, "fetch_history",
+                            str(self.targets[t]["history"]))
+
+            self.config.set(key, "build", str(self.targets[t]["build"]))
+
+            subtargets = []
+            for s in self.targets[t]["parallelbuild_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len (st)< 1:
+                    continue
+                subtargets.append(st[-1])
+
+            self.config.set(key, "build_steps", ",".join(subtargets))
+
+            if self.config.has_section("binaries") is True:
+                for b in self.config["binaries"]:
+                    self.config.set("binaries", b,
+                                    str(self.binaries[b]["chosen"]))
+
+            # set project name
+            if self.config.has_section("project") is False:
+                self.config.add_section("project")
+
+            self.config.set("project", "name", self.get_name())
+            self.config.set("project", "path", self.config_path)
+
+        history_path = self.root_path + "/.history/"
+        if not os.path.exists(history_path):
+            os.makedirs(history_path)
+
+        try:
+            history_fname = time.strftime("%Y%m%d%H%M%S_")
+            history_fname = history_path + history_fname
+            history_fname = history_fname + self.get_fullname()
+
+            cfgfile = open(history_fname, 'w')
+            self.config.write(cfgfile)
+            self.utils.print_message(self.utils.logtype.INFO,
+                                    "History file saved.")
+        except:
+            self.utils.print_message(self.utils.logtype.WARNING,
+                                    "Failed to save history file.")
+
 
     def get_name(self):
         return self.target_name
