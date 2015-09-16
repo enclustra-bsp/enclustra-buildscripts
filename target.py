@@ -63,6 +63,9 @@ class Target:
             target_helpbox = None
             target_disable = None
             target_branch = None
+            target_fetch = True
+            target_fetch_history = False
+            target_build = True
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
 
@@ -90,9 +93,34 @@ class Target:
                     subtarget['name'] = target + " " + command
                     subtarget['cmd'] = self.config[str(target) +
                                                    "-parallelbuild"][command]
-                    subtarget['enabled'] = True
+
+                    key = target + "-options"
+                    skey = "build_steps"
+
+                    subtarget['enabled'] = False
+
+                    if self.config.has_section(key) is False:
+                        subtarget['enabled'] = True
+                        target_parallelbuild_commands.append(subtarget)
+                        continue
+                    if self.config.has_option(key, skey) is False:
+                        subtarget['enabled'] = True
+                        target_parallelbuild_commands.append(subtarget)
+                        continue
+
+                    subtarget['enabled'] = command in self.config[key][skey]
 
                     target_parallelbuild_commands.append(subtarget)
+
+            if self.config.has_section(key) is True:
+                if self.config.has_option(key, "fetch"):
+                    target_fetch = self.config.getboolean(key, "fetch")
+                if self.config.has_option(key, "fetch_history"):
+                    target_fetch_history = \
+                        self.config.getboolean(key, "fetch_history")
+
+                if self.config.has_option(key, "build"):
+                    target_build = self.config.getboolean(key, "build")
 
             if self.config.has_section(target + "-patches") is True:
                 for patch in self.config[target + "-patches"]:
@@ -112,10 +140,10 @@ class Target:
             target_descriptor.update([("help", target_help)])
             target_descriptor.update([("helpbox", target_helpbox)])
             target_descriptor.update([("disable", target_disable)])
-            target_descriptor.update([("fetch", target_active)])
+            target_descriptor.update([("fetch", target_fetch)])
             target_descriptor.update([("disable_fetch", False)])
-            target_descriptor.update([("history", False)])
-            target_descriptor.update([("build", target_active)])
+            target_descriptor.update([("history", target_fetch_history)])
+            target_descriptor.update([("build", target_build)])
             target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
