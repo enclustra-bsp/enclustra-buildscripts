@@ -85,11 +85,10 @@ class Target:
             cfgfile = open(history_fname, 'w')
             self.config.write(cfgfile)
             self.utils.print_message(self.utils.logtype.INFO,
-                                    "History file saved.")
+                                     "History file saved.")
         except:
             self.utils.print_message(self.utils.logtype.WARNING,
-                                    "Failed to save history file.")
-
+                                     "Failed to save history file.")
 
     def get_name(self):
         return self.target_name

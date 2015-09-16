@@ -43,7 +43,7 @@ class Gui:
                 width = len(text) + 16
         return self.dialog.menu("Choose configuration",
                                 choices=configs,
-                                width = width,
+                                width=width,
                                 cancel_label="Exit")
 
     def step_in(self, directory):
