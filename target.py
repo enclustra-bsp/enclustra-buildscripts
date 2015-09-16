@@ -286,8 +286,8 @@ class Target:
     def get_binaries(self):
         binaries = []
         for binary in self.binaries:
-            binaries.append([(self.binaries[binary])["description"], "",
-                            (self.binaries[binary])["default"]])
+            binaries.append([(self.binaries[binary])["description"], ""])
+
         return binaries
 
     def set_binaries(self, bin_desc):

@@ -158,11 +158,11 @@ class Gui:
 
     def show_binaries_menu(self, menu_items):
         if len(menu_items) != 0:
-            return self.dialog.radiolist("Choose the device option.",
-                                         choices=menu_items,
-                                         help_button=True,
-                                         help_tags=True,
-                                         cancel_label="Back")
+            return self.dialog.menu("Choose the device option.",
+                                    choices=menu_items,
+                                    help_button=True,
+                                    help_tags=True,
+                                    cancel_label="Back")
         else:
             return self.dialog.msgbox("No device options found!")
 
