@@ -452,7 +452,7 @@ while done is False:
                 # set the project name
                 t.target_name = t.config["project"]["name"]
                 # set config path
-                t.config_path = t.config["project"]["path"]
+                t.config_path = root_path + t.config["project"]["path"]
 
                 state = "SHOW_SUMMARY"
         else:

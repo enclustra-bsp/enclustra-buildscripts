@@ -70,7 +70,10 @@ class Target:
                 self.config.add_section("project")
 
             self.config.set("project", "name", self.get_name())
-            self.config.set("project", "path", self.config_path)
+
+            relative_path = self.config_path[len(self.root_path):]
+
+            self.config.set("project", "path", relative_path)
 
         history_path = self.root_path + "/.history/"
         if not os.path.exists(history_path):
