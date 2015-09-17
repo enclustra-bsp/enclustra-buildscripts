@@ -141,6 +141,7 @@ class Target:
                     target_build_commands.append(self.config[str(target) +
                                                  "-build"][command])
 
+            key = target + "-options"
             if self.config.has_section(target + "-parallelbuild") is True:
                 for command in self.config[target + "-parallelbuild"]:
                     subtarget = dict()
@@ -148,7 +149,6 @@ class Target:
                     subtarget['cmd'] = self.config[str(target) +
                                                    "-parallelbuild"][command]
 
-                    key = target + "-options"
                     skey = "build_steps"
 
                     subtarget['enabled'] = False
