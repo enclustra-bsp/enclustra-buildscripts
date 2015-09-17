@@ -428,7 +428,7 @@ while done is False:
         cfg = []
         prev_cfg = os.listdir(root_path + "/.history")
         for c in prev_cfg:
-            cfg.append((c, ""))
+            cfg.append((c.split(".")[0], ""))
 
         code, tag = g.show_previous_configs(sorted(cfg))
         if code == "ok":
@@ -439,7 +439,7 @@ while done is False:
                 def_fname = tag
                 # initialize target
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
-                                  root_path + "/.history/" + tag,
+                                  root_path + "/.history/" + tag + ".ini",
                                   "No name", debug_calls, utils)
 
                 # binaries have to be set by hand

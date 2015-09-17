@@ -77,7 +77,7 @@ class Target:
             os.makedirs(history_path)
 
         try:
-            history_fname = history_path + filename
+            history_fname = history_path + filename + ".ini"
 
             cfgfile = open(history_fname, 'w')
             self.config.write(cfgfile)
