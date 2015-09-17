@@ -709,6 +709,7 @@ class Target:
                     dst = dst_path + "/" + outfile[0]
                     try:
                         shutil.copyfile(src, dst)
+                        shutil.copymode(src, dst)
                         self.utils.print_message(self.utils.logtype.INFO,
                                                  "Copying ./" + os.path.relpath(src) +
                                                  " to ./" + os.path.relpath(dst))
