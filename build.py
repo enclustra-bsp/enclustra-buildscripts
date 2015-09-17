@@ -36,6 +36,8 @@ try:
     import subprocess
     import shutil
     import argparse
+    import time
+    import re
 
     import target
     import gui
@@ -408,6 +410,7 @@ utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
 # Main loop
 g = None
+def_fname = None
 while done is False:
     used_previous_config = False
     if state == "INIT":
@@ -433,6 +436,7 @@ while done is False:
                 state = "TARGET_MENU"
             else:
                 used_previous_config = True
+                def_fname = tag
                 # initialize target
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
                                   root_path + "/.history/" + tag,
@@ -533,7 +537,10 @@ while done is False:
     elif state == "SHOW_SUMMARY":
         code = g.show_summary_menu(t.get_summary(), used_previous_config)
         if code == "ok":
-            state = "DO_FETCH"
+            if used_previous_config is True:
+                state = "DO_FETCH"
+            else:
+                state = "SAVE_CONFIG"
         elif code in ("cancel", "esc"):
             if used_previous_config is True:
                 state = "FETCH_MENU"
@@ -543,10 +550,31 @@ while done is False:
                 state = "BUILD_MENU"
         continue
 
-    elif state == "DO_FETCH":
-        # save config
-        t.save_config()
+    elif state == "SAVE_CONFIG":
+        if def_fname is None:
+            def_fname = time.strftime("%Y%m%d%H%M%S_") + t.get_fullname()
 
+        string = def_fname
+        code = "?"
+
+        while True:
+            code, string = g.show_history_fname_dialog(string)
+            if code != "ok":
+                break
+            if not re.match("^[a-zA-Z0-9_-]+$", string):
+                err_msg = "Please use the following character set [a-zA-Z0-9_-]"
+                g.dialog.msgbox(err_msg, width=len(err_msg)+10)
+                continue
+            break
+
+        def_fname = string
+        if code == "ok":
+            # save config
+            t.save_config(def_fname)
+
+        state = "DO_FETCH"
+
+    elif state == "DO_FETCH":
         # clear console
         if g:
             subprocess.call("clear")
@@ -578,13 +606,13 @@ while done is False:
 
     elif state == "DO_COPYFILES":
         utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
-        out_dir = t.get_out_dir(root_path)
+        out_dir = "out_" + def_fname
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        out_dir = t.get_out_dir(root_path)
+        out_dir = "out_" + def_fname
 
         required_toolchains = t.get_required_toolchains()
         try:

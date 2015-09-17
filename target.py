@@ -16,7 +16,6 @@ import os
 import sys
 import shutil
 import archive
-import time
 
 
 class Target:
@@ -38,7 +37,7 @@ class Target:
         self.debug_calls = debug_calls
         self.utils = utils
 
-    def save_config(self):
+    def save_config(self, filename):
         for t in self.targets:
             key = t + "-options"
             if self.config.has_section(key) is False:
@@ -78,9 +77,7 @@ class Target:
             os.makedirs(history_path)
 
         try:
-            history_fname = time.strftime("%Y%m%d%H%M%S_")
-            history_fname = history_path + history_fname
-            history_fname = history_fname + self.get_fullname()
+            history_fname = history_path + filename
 
             cfgfile = open(history_fname, 'w')
             self.config.write(cfgfile)

@@ -218,3 +218,11 @@ class Gui:
 
         return self.dialog.yesno(w_text, w_height, w_width,
                                  yes_label="Proceed", no_label=back_label)
+
+    def show_history_fname_dialog(self, def_name):
+        width = len(def_name) + 10
+        if width < 80:
+            width = 80
+
+        return self.dialog.inputbox("Save configuration file...",
+                init=def_name, width=width, cancel_label="Build without saving")
