@@ -167,6 +167,7 @@ class Utils:
                 # if toolchain is registered as 'local' return empty string
                 if registered[toolchain]["remote"] is False:
                     return_paths.append("")
+                    continue
 
                 toolchain_location = registered[toolchain]["server"]
 
