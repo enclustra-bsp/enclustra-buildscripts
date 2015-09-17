@@ -333,11 +333,7 @@ elif args.device is not None:
         t.set_binaries(chosen_bin[0])
     else:
         # set the default one
-        binaries = t.get_binaries()
-        for binary in binaries:
-            if binary[2] is True:
-                t.set_binaries(binary[0])
-                break
+        t.set_binaries(t.get_default_binary())
 
     state = "DO_FETCH"
 elif args.list_devices is True:
@@ -605,6 +601,8 @@ while done is False:
         t.do_get_binaries(binaries_path)
 
     elif state == "DO_COPYFILES":
+        if def_fname is None:
+            def_fname = t.get_fullname()
         utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
         out_dir = "out_" + def_fname
         utils.mkdir_p(out_dir)
