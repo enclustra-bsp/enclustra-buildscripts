@@ -100,9 +100,6 @@ class Target:
             return self.get_name() + "_" + self.binaries[b]['shortname']
         return self.get_name()
 
-    def get_out_dir(self, root_path):
-        return root_path + "/" + "out_" + self.get_fullname()
-
     def parse_init_file(self):
         for toolchain in self.config['toolchains']:
             self.toolchains.append(self.config['toolchains'][toolchain])
