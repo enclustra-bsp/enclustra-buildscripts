@@ -567,6 +567,8 @@ while done is False:
         if code == "ok":
             # save config
             t.save_config(def_fname)
+        else:
+            def_fname = t.get_fullname()
 
         state = "DO_FETCH"
 
