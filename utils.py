@@ -172,6 +172,15 @@ class Utils:
                 toolchain_location = registered[toolchain]["server"]
 
                 with self.cd(path + "/bin"):
+                    # if archive exists but the catalog does not it is probably
+                    # a malformed archive - delete it
+                    if os.path.isfile(os.path.basename(toolchain_location)):
+                        if not os.path.isdir(registered[toolchain]["path"]):
+                            self.print_message(self.logtype.INFO,
+                                               "Toolchain archive seems to ",
+                                               "be corrupted, redownloading")
+                            os.remove(os.path.basename(toolchain_location))
+
                     if os.path.isfile(os.path.basename(toolchain_location)) is False:
                         call = "wget " + toolchain_location
                         if self.call_tool(call) != 0:
