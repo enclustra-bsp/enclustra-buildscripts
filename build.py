@@ -38,6 +38,7 @@ try:
     import argparse
     import time
     import re
+    from stat import S_ISREG, ST_MTIME, ST_MODE
 
     import target
     import gui
@@ -422,11 +423,17 @@ while done is False:
 
     if state == "HISTORY_MENU":
         cfg = []
-        prev_cfg = os.listdir(root_path + "/.history")
-        for c in prev_cfg:
-            cfg.append((c.split(".")[0], ""))
+        dirpath = root_path + "/.history"
+        entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
+        entries = ((os.stat(path), path) for path in entries)
+        entries = ((stat[ST_MTIME], path)
+                   for stat, path in entries if S_ISREG(stat[ST_MODE]))
 
-        code, tag = g.show_previous_configs(sorted(cfg))
+        for cdate, path in sorted(entries, reverse=True):
+            path = path.split("/")[-1]
+            cfg.append((path.split(".")[0], ""))
+
+        code, tag = g.show_previous_configs(cfg)
         if code == "ok":
             if tag == g.new_config_tag:
                 state = "TARGET_MENU"
