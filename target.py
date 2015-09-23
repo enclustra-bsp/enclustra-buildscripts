@@ -697,6 +697,18 @@ class Target:
                         (self.targets[target])["repository"] +\
                         "/" + outfile[1]
                     dst = dst_path + "/" + outfile[0]
+                    dstdir = "/".join(dst.split("/")[:-1])
+
+                    dstdir = os.path.abspath(dstdir)
+
+                    if dstdir.startswith(dst_path) is False:
+                        self.utils.print_message(self.utils.logtype.ERROR,
+                                                 "Destination file out of ",
+                                                 "output directory")
+                        continue
+
+                    self.utils.mkdir_p(dstdir)
+
                     try:
                         shutil.copyfile(src, dst)
                         shutil.copymode(src, dst)
