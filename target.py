@@ -75,7 +75,7 @@ class Target:
 
             self.config.set("project", "path", relative_path)
 
-        history_path = self.root_path + "/.history/"
+        history_path = os.path.expanduser("~") + "/.ebe/history/"
         if not os.path.exists(history_path):
             os.makedirs(history_path)
 

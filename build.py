@@ -414,7 +414,7 @@ while done is False:
         g = gui.Gui(root_path+"/targets")
         g.show_welcome_screen(welcome_msg)
 
-        history_path = root_path + "/.history/"
+        history_path = os.path.expanduser("~") + "/.ebe/history/"
 
         if os.path.exists(history_path) and os.listdir(history_path):
             state = "HISTORY_MENU"
@@ -423,7 +423,7 @@ while done is False:
 
     if state == "HISTORY_MENU":
         cfg = []
-        dirpath = root_path + "/.history"
+        dirpath = os.path.expanduser("~") + "/.ebe/history/"
         entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
         entries = ((os.stat(path), path) for path in entries)
         entries = ((stat[ST_MTIME], path)
@@ -440,9 +440,10 @@ while done is False:
             else:
                 used_previous_config = True
                 def_fname = tag
+                dirpath = os.path.expanduser("~") + "/.ebe/history/"
                 # initialize target
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
-                                  root_path + "/.history/" + tag + ".ini",
+                                  dirpath + tag + ".ini",
                                   "No name", debug_calls, utils)
 
                 # binaries have to be set by hand
