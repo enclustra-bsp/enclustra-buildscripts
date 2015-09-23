@@ -264,14 +264,14 @@ elif args.device is not None:
         sys.exit(0)
 
     if args.list_dev_options is True:
-        binaries = t.get_binaries()
+        binaries = t.get_marked_binaries()
         print(str("Available options for " + args.device + ":"))
         count = 1
         for binary in binaries:
             default = ""
-            if binary[2] is True:
+            if binary["default"] is True:
                 default = " (default)"
-            print(str(count) + ". " + str(binary[0]) + default)
+            print(str(count) + ". " + str(binary["description"]) + default)
             count += 1
         sys.exit(0)
 
@@ -319,7 +319,7 @@ elif args.device is not None:
     t.set_build_opts(build_opts)
 
     if args.device_option is not None:
-        binaries = t.get_binaries()
+        binaries = t.get_marked_binaries()
         index = int(args.device_option)
         if index < 1:
             utils.print_message(utils.logtype.ERROR,
@@ -331,7 +331,7 @@ elif args.device is not None:
                                 "count:", len(binaries))
             sys.exit(1)
         chosen_bin = binaries[index-1]
-        t.set_binaries(chosen_bin[0])
+        t.set_binaries(chosen_bin["description"])
     else:
         # set the default one
         t.set_binaries(t.get_default_binary())

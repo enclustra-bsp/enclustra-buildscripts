@@ -280,6 +280,16 @@ class Target:
 
         return binaries
 
+    def get_marked_binaries(self):
+        binaries = []
+        for binary in self.binaries:
+            b = dict()
+            b["description"] = (self.binaries[binary])["description"]
+            b["default"] = (self.binaries[binary])["default"]
+            binaries.append(b)
+
+        return binaries
+
     def get_default_binary(self):
         for binary in self.binaries:
             if self.binaries[binary]["default"]:
