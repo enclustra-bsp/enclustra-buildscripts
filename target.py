@@ -93,13 +93,6 @@ class Target:
     def get_name(self):
         return self.target_name
 
-    def get_fullname(self):
-        for b in self.binaries:
-            if self.binaries[b]['chosen'] is False:
-                continue
-            return self.get_name() + "_" + self.binaries[b]['shortname']
-        return self.get_name()
-
     def parse_init_file(self):
         for toolchain in self.config['toolchains']:
             self.toolchains.append(self.config['toolchains'][toolchain])

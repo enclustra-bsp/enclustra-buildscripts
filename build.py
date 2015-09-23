@@ -556,7 +556,7 @@ while done is False:
 
     elif state == "SAVE_CONFIG":
         if def_fname is None:
-            def_fname = time.strftime("%Y%m%d%H%M%S_") + t.get_fullname()
+            def_fname = time.strftime("%Y%m%d%H%M%S_") + t.get_name()
 
         string = def_fname
         code = "?"
@@ -576,7 +576,7 @@ while done is False:
             # save config
             t.save_config(def_fname)
         else:
-            def_fname = t.get_fullname()
+            def_fname = t.get_name()
 
         state = "DO_FETCH"
 
@@ -612,7 +612,7 @@ while done is False:
 
     elif state == "DO_COPYFILES":
         if def_fname is None:
-            def_fname = t.get_fullname()
+            def_fname = t.get_name()
         utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
         out_dir = "out_" + def_fname
         utils.mkdir_p(out_dir)
