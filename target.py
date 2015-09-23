@@ -421,6 +421,12 @@ class Target:
         # handle targets disabled by others
         self.handle_disable("build")
 
+    def set_build_all(self):
+        for target in self.targets:
+            (self.targets[target])["build"] = True
+        # handle targets disabled by others
+        self.handle_disable("build")
+
     def set_not_build(self, build):
         for target in build:
             (self.targets[target])["build"] = False

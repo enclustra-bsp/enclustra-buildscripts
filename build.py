@@ -288,7 +288,7 @@ elif args.device is not None:
         fetch_group.extend(args.target_fetch)
 
     if args.target_build is not None:
-        build_group.extend(args.target_fetch)
+        build_group.extend(args.target_build)
 
     if args.fetch_history is not None:
         fetch_group.extend(args.fetch_history)
@@ -307,16 +307,16 @@ elif args.device is not None:
     if fetch_group or build_group:
         t.set_fetch(fetch_group)
         t.set_build(build_group)
-    # else: build all default targets
 
-    invalid_targets = t.validate_subtargets(build_opts)
-    if len(invalid_targets) > 0:
-        utils.print_message(utils.logtype.ERROR,
-                            "Invalid targets specified:",
-                            ', '.join(invalid_targets))
-        sys.exit(1)
-
-    t.set_build_opts(build_opts)
+        invalid_targets = t.validate_subtargets(build_opts)
+        t.set_build_opts(build_opts)
+        if len(invalid_targets) > 0:
+            utils.print_message(utils.logtype.ERROR,
+                                "Invalid targets specified:",
+                                ', '.join(invalid_targets))
+            sys.exit(1)
+    else:
+        t.set_build_all()
 
     if args.device_option is not None:
         binaries = t.get_marked_binaries()
