@@ -29,6 +29,7 @@ class Utils:
         OK = 2
         WARNING = 3
         ERROR = 4
+        HEADER = 5
 
     class bcolors:
         HEADER = '\033[35m'
@@ -94,6 +95,9 @@ class Utils:
             textcolor = ((self.bcolors.BOLD + self.bcolors.ERROR) if
                     self.nicecolors else "") + "ERROR: "
             self.error_count += 1
+        elif loglevel == self.logtype.HEADER:
+            textcolor = ((self.bcolors.HEADER) if
+                    self.nicecolors else "") + "+"
         else:
             textcolor = ""
 
@@ -112,8 +116,7 @@ class Utils:
 
     def call_tool(self, call):
         if self.debug is True:
-            print((self.bcolors.HEADER if self.nicecolors else "") + "+" +
-                    call + (self.bcolors.ENDC if self.nicecolors else ""))
+            self.print_message(self.logtype.HEADER, call)
         proc = subprocess.Popen(shlex.split(call), stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT)
         for line in proc.stdout:
