@@ -45,6 +45,7 @@ class Utils:
         self.log_file = None
         self.quiet_mode = False
         self.break_on_error = False
+        self.nicecolors = True
         self.warning_count = 0
         self.error_count = 0
 
@@ -75,16 +76,23 @@ class Utils:
     def set_break_on_error(self, mode):
         self.break_on_error = mode
 
+    def set_colors(self, mode):
+        self.nicecolors = mode
+
     def print_message(self, loglevel, *args):
         if loglevel == self.logtype.INFO:
-            textcolor = self.bcolors.BOLD + self.bcolors.INFO + "INFO: "
+            textcolor = ((self.bcolors.BOLD + self.bcolors.INFO) if
+                    self.nicecolors else "") + "INFO: "
         elif loglevel == self.logtype.OK:
-            textcolor = self.bcolors.BOLD + self.bcolors.OK
+            textcolor = ((self.bcolors.BOLD + self.bcolors.OK) if
+                    self.nicecolors else "")
         elif loglevel == self.logtype.WARNING:
-            textcolor = self.bcolors.BOLD + self.bcolors.WARNING + "WARNING: "
+            textcolor = ((self.bcolors.BOLD + self.bcolors.WARNING) if
+                    self.nicecolors else "") + "WARNING: "
             self.warning_count += 1
         elif loglevel == self.logtype.ERROR:
-            textcolor = self.bcolors.BOLD + self.bcolors.ERROR + "ERROR: "
+            textcolor = ((self.bcolors.BOLD + self.bcolors.ERROR) if
+                    self.nicecolors else "") + "ERROR: "
             self.error_count += 1
         else:
             textcolor = ""
@@ -93,7 +101,8 @@ class Utils:
             self.log_file.write(" ".join(str(i) for i in args) + '\n')
             self.log_file.flush()
 
-        print(textcolor + " ".join(str(i) for i in args) + self.bcolors.ENDC)
+        print(textcolor + " ".join(str(i) for i in args) +
+                (self.bcolors.ENDC if self.nicecolors else ""))
 
         if loglevel == self.logtype.ERROR:
             if self.break_on_error is True:
@@ -103,7 +112,8 @@ class Utils:
 
     def call_tool(self, call):
         if self.debug is True:
-            print(self.bcolors.HEADER + "+" + call + self.bcolors.ENDC)
+            print((self.bcolors.HEADER if self.nicecolors else "") + "+" +
+                    call + (self.bcolors.ENDC if self.nicecolors else ""))
         proc = subprocess.Popen(shlex.split(call), stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT)
         for line in proc.stdout:

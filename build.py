@@ -127,6 +127,10 @@ parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
                     help='list all available device options for chosen device')
 
+parser.add_argument("--anti-pony", action='store_true',
+                    required=False, dest='disable_colors',
+                    help='disables colored output')
+
 parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
                     help='set device option by index, the default one will'
@@ -182,6 +186,9 @@ tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
     "\nAll rights reserved."
 
 args = parser.parse_args()
+
+if args.disable_colors is True:
+    utils.set_colors(False)
 
 if args.version is True:
     print(str("\n" + tool_version + "\n"))
