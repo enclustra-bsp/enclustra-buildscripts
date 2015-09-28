@@ -293,7 +293,7 @@ class Target:
     def get_default_binary(self):
         for binary in self.binaries:
             if self.binaries[binary]["default"]:
-                return binary
+                return (self.binaries[binary])["description"]
 
     def set_binaries(self, bin_desc):
         for binary in self.binaries:
