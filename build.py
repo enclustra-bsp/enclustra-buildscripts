@@ -127,7 +127,7 @@ parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
                     help='list all available device options for chosen device')
 
-parser.add_argument("--anti-pony", action='store_true',
+parser.add_argument("--anti-unicorn", action='store_true',
                     required=False, dest='disable_colors',
                     help='disables colored output')
 
