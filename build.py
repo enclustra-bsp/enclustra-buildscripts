@@ -621,14 +621,14 @@ while done is False:
         if def_fname is None:
             def_fname = t.get_name()
         utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
-        out_dir = "out_" + def_fname
+        out_dir = root_path + "/out_" + def_fname
         out_dir = os.path.abspath(out_dir)
         utils.mkdir_p(out_dir)
         t.do_copyfiles(out_dir)
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        out_dir = "out_" + def_fname
+        out_dir = root_path +  "/out_" + def_fname
 
         required_toolchains = t.get_required_toolchains()
         try:
