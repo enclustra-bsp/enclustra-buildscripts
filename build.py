@@ -179,7 +179,7 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision(root_path).rstrip('\n')
-tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
+tool_version = tool_name + " (v1.0-" + revision + ")\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
     "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
