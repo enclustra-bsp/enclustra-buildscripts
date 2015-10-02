@@ -141,6 +141,11 @@ parser.add_argument("-c", "--clean-all", action='store_true',
                     help='delete all downloaded code, binaries, tools and'
                     ' built files')
 
+parser.add_argument("-C", "--clean-soft", action='store_true',
+                    required=False, dest='clean_soft',
+                    help='run clean commands for all specified targets'
+                    ' (if available)')
+
 parser.add_argument("-v", "--version", action='store_true', required=False,
                     dest='version',
                     help='print version')
@@ -310,6 +315,19 @@ elif args.device is not None:
                 build_opts.extend(t.get_subtargets(target[0]))
 
             build_group.append(target[0])
+
+    # Remove duplicates
+    build_group = list(set(build_group))
+    fetch_group = list(set(fetch_group))
+
+    if args.clean_soft:
+        clean_tar = fetch_group + build_group
+        # remove duplicates
+        clean_tar = list(set(clean_tar))
+        if not clean_tar:
+            clean_tar = t.targets.keys()
+        t.clean_targets(clean_tar, t.get_required_toolchains())
+        sys.exit(1)
 
     if fetch_group or build_group:
         t.set_fetch(fetch_group)

@@ -31,6 +31,7 @@ class Target:
         self.targets = dict()
         self.binaries = dict()
         self.bootimages = dict()
+        self.clean = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
         binary_keys = self.binaries.keys()
@@ -201,6 +202,10 @@ class Target:
 
             self.targets.update([(target, target_descriptor)])
 
+        if self.config.has_section("clean") is True:
+            for target in self.config["clean"]:
+                self.clean[target] = self.config["clean"][target]
+
         # get binaries (if any)
         if self.config.has_section("binaries"):
             for binary in self.config["binaries"]:
@@ -260,6 +265,34 @@ class Target:
                             result_files.append(f)
                 self.bootimages[k]['files'] = files
                 self.bootimages[k]['result_files'] = result_files
+
+    def clean_targets(self, targets, toolchains):
+        for t in targets:
+            if not t in self.clean:
+                self.utils.print_message(self.utils.logtype.WARNING,
+                                         "No clean command for",
+                                         t, "target defined")
+                continue
+
+            self.utils.print_message(self.utils.logtype.INFO,
+                                     "Running clean command for",
+                                     t, "target")
+
+            with self.utils.cd((self.master_repo_path + "/" +
+                               (self.targets[t])["repository"])):
+
+                orig_path = os.environ["PATH"]
+                toolchain_path = ""
+                for path in toolchains:
+                    toolchain_path += str(path) + ":"
+
+                os.environ["PATH"] = toolchain_path + orig_path
+
+                # build parallel targets
+                self.utils.call_tool(self.clean[t])
+
+                # restore original PATH
+                os.environ["PATH"] = orig_path
 
     def get_target_helpbox(self, target):
         return self.targets[target]["helpbox"]
