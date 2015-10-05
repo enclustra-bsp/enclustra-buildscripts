@@ -225,4 +225,5 @@ class Gui:
             width = 80
 
         return self.dialog.inputbox("Save configuration file...",
-                init=def_name, width=width, cancel_label="Build without saving")
+                                    init=def_name, width=width,
+                                    cancel_label="Build without saving")

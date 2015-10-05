@@ -34,7 +34,6 @@ class Target:
         self.clean = dict()
         self.parse_init_file()
         self.target_name = str(target_name)
-        binary_keys = self.binaries.keys()
         self.debug_calls = debug_calls
         self.utils = utils
 
@@ -55,7 +54,7 @@ class Target:
                 if s["enabled"] is False:
                     continue
                 st = s["name"].split(" ")
-                if len (st)< 1:
+                if len(st) < 1:
                     continue
                 subtargets.append(st[-1])
 
@@ -260,7 +259,7 @@ class Target:
                         if self.config.getboolean(k + '-required-files', f):
                             files.append(f)
                 if self.config.has_section(k + "-required-files"):
-                    for f in self.config[k +'-result-files']:
+                    for f in self.config[k + '-result-files']:
                         if self.config.getboolean(k + '-result-files', f):
                             result_files.append(f)
                 self.bootimages[k]['files'] = files
@@ -268,7 +267,7 @@ class Target:
 
     def clean_targets(self, targets, toolchains):
         for t in targets:
-            if not t in self.clean:
+            if t not in self.clean:
                 self.utils.print_message(self.utils.logtype.WARNING,
                                          "No clean command for",
                                          t, "target defined")
@@ -518,8 +517,9 @@ class Target:
                 call = "git fetch " + depth + " origin " + \
                        (self.targets[target])["branch"]
 
-                repo_dir = self.master_repo_path + "/" + \
-                           str((self.targets[target])["repository"])
+                repo_dir = \
+                    self.master_repo_path + "/" + \
+                    str((self.targets[target])["repository"])
 
                 with self.utils.cd(repo_dir):
                     sp = self.utils.call_tool(call)
@@ -656,7 +656,8 @@ class Target:
                 if "postbuild" in self.targets[target]:
                     # copy script file to just fetched repository
                     try:
-                        self.utils.run_post_script("build", self.targets[target],
+                        self.utils.run_post_script("build",
+                                                   self.targets[target],
                                                    self.config_path,
                                                    self.master_repo_path)
                     except:
@@ -698,8 +699,8 @@ class Target:
                 self.utils.mkdir_p(download_path)
             except:
                 self.utils.print_message(self.utils.logtype.ERROR,
-                                         "Failed to create download folder for",
-                                         binary, "binary")
+                                         "Failed to create download folder",
+                                         "for ", binary, "binary")
                 continue
             # download binary
             binary_file = os.path.basename(self.binaries[binary]["uri"])
@@ -762,8 +763,10 @@ class Target:
                         shutil.copyfile(src, dst)
                         shutil.copymode(src, dst)
                         self.utils.print_message(self.utils.logtype.INFO,
-                                                 "Copying ./" + os.path.relpath(src) +
-                                                 " to ./" + os.path.relpath(dst))
+                                                 "Copying ./" +
+                                                 os.path.relpath(src) +
+                                                 " to ./" +
+                                                 os.path.relpath(dst))
                     except Exception as exc:
                         self.utils.print_message(self.utils.logtype.ERROR,
                                                  "Error while copying file",
@@ -795,8 +798,9 @@ class Target:
                 try:
                     shutil.copyfile(src, dst)
                     self.utils.print_message(self.utils.logtype.INFO,
-                                                 "Copying ./" + os.path.relpath(src) +
-                                                 " to ./" + os.path.relpath(dst))
+                                             "Copying ./" +
+                                             os.path.relpath(src) +
+                                             " to ./" + os.path.relpath(dst))
                 except Exception as exc:
                     self.utils.print_message(self.utils.logtype.WARNING,
                                              "Error while copying file",
@@ -827,8 +831,8 @@ class Target:
                                         bootimages[k]['cmd'])
                 if sp != 0:
                     self.utils.print_message(self.utils.logtype.ERROR,
-                                            "Error generating bootimage:",
-                                            k)
+                                             "Error generating bootimage:",
+                                             k)
                     generate_img = False
 
             if generate_img:

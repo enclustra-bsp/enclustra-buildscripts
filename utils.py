@@ -83,21 +83,21 @@ class Utils:
     def print_message(self, loglevel, *args):
         if loglevel == self.logtype.INFO:
             textcolor = ((self.bcolors.BOLD + self.bcolors.INFO) if
-                    self.nicecolors else "") + "INFO: "
+                         self.nicecolors else "") + "INFO: "
         elif loglevel == self.logtype.OK:
             textcolor = ((self.bcolors.BOLD + self.bcolors.OK) if
-                    self.nicecolors else "")
+                         self.nicecolors else "")
         elif loglevel == self.logtype.WARNING:
             textcolor = ((self.bcolors.BOLD + self.bcolors.WARNING) if
-                    self.nicecolors else "") + "WARNING: "
+                         self.nicecolors else "") + "WARNING: "
             self.warning_count += 1
         elif loglevel == self.logtype.ERROR:
             textcolor = ((self.bcolors.BOLD + self.bcolors.ERROR) if
-                    self.nicecolors else "") + "ERROR: "
+                         self.nicecolors else "") + "ERROR: "
             self.error_count += 1
         elif loglevel == self.logtype.HEADER:
             textcolor = ((self.bcolors.HEADER) if
-                    self.nicecolors else "") + "+"
+                         self.nicecolors else "") + "+"
         else:
             textcolor = ""
 
@@ -106,7 +106,7 @@ class Utils:
             self.log_file.flush()
 
         print(textcolor + " ".join(str(i) for i in args) +
-                (self.bcolors.ENDC if self.nicecolors else ""))
+              (self.bcolors.ENDC if self.nicecolors else ""))
 
         if loglevel == self.logtype.ERROR:
             if self.break_on_error is True:
@@ -194,15 +194,18 @@ class Utils:
                                                "be corrupted, redownloading")
                             os.remove(os.path.basename(toolchain_location))
 
-                    if os.path.isfile(os.path.basename(toolchain_location)) is False:
+                    if os.path.isfile(
+                            os.path.basename(toolchain_location)) is False:
                         call = "wget " + toolchain_location
                         if self.call_tool(call) != 0:
                             self.print_message(self.logtype.ERROR,
-                                               "Error while downloading toolchain")
+                                               "Error while downloading",
+                                               "toolchain")
                             raise NameError("Required toolchains: " +
                                             ", ".join(required))
                         try:
-                            a = archive.Archive(os.path.basename(toolchain_location))
+                            a = archive.Archive(
+                                os.path.basename(toolchain_location))
                             a.extract()
                         except Exception as ext:
                             # the downloaded file is corrupted, delete it
@@ -210,7 +213,8 @@ class Utils:
 
                             self.print_message(self.logtype.ERROR,
                                                "Error while unpacking",
-                                               os.path.basename(toolchain_location),
+                                               os.path.basename(
+                                                   toolchain_location),
                                                "toolchain.",
                                                str(ext),
                                                "- deleting.")
@@ -218,7 +222,8 @@ class Utils:
                             raise NameError("Required toolchains: " +
                                             ", ".join(required))
 
-                return_paths.append(path + "/bin/" + registered[toolchain]["path"])
+                return_paths.append(path + "/bin/" +
+                                    registered[toolchain]["path"])
             else:
                 self.print_message(self.logtype.ERROR, required,
                                    "toolchain is not registered")
@@ -240,12 +245,13 @@ class Utils:
                                                  stderr=subprocess.PIPE)
         except:
             return False
-        local = self.splittedname(str(stdoutdata).split()[version_location - 1])
+        local = \
+            self.splittedname(str(stdoutdata).split()[version_location - 1])
         minimal = self.splittedname(minimal_version)
         return local >= minimal
 
     def list_devices_raw(self, root_path, entry_point=""):
-        for root, dirs, files in os.walk(root_path + "/targets/" + entry_point):
+        for root, dirs, fls in os.walk(root_path + "/targets/" + entry_point):
             if root == "targets" + entry_point:
                 continue
             if len(dirs) == 0:

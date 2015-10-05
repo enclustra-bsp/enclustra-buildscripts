@@ -25,7 +25,7 @@ try:
 
 except ImportError as e:
     # could not import utils module, exit
-    print "Dependencies missing: " + str(e)
+    print("Dependencies missing: " + str(e))
     sys.exit(1)
 
 try:
@@ -79,7 +79,9 @@ utils.init_sigint_handler()
 # setup argument parser
 parser = argparse.ArgumentParser(description=tool_name, prog='tool',
                                  formatter_class=lambda prog:
-                                 argparse.HelpFormatter(prog, max_help_position=32))
+                                 argparse.HelpFormatter(
+                                     prog,
+                                     max_help_position=32))
 
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
@@ -94,8 +96,8 @@ parser.add_argument("-d", "--device", action='store', required=False,
                     help='specify device as follows: \
                        <family>/<module>/<base_board>/<boot_device>')
 
-parser.add_argument("-l", "--list-targets", action='store_true', required=False,
-                    dest='list_targets',
+parser.add_argument("-l", "--list-targets", action='store_true',
+                    required=False, dest='list_targets',
                     help='list all targets for chosen device')
 
 parser.add_argument("--list-targets-raw", action='store_true', required=False,
@@ -343,14 +345,14 @@ elif args.device is not None:
         t.set_fetch_opts(args.fetch_history)
 
     if args.custom_target_build is not None:
-        for target in args.custom_target_build:
-            if len(target) > 1:
-                for st in target[1].split(','):
-                    build_opts.append(target[0] + " " + st)
+        for tgt in args.custom_target_build:
+            if len(tgt) > 1:
+                for st in tgt[1].split(','):
+                    build_opts.append(tgt[0] + " " + st)
             else:
-                build_opts.extend(t.get_subtargets(target[0]))
+                build_opts.extend(t.get_subtargets(tgt[0]))
 
-            build_group.append(target[0])
+            build_group.append(tgt[0])
 
     # Remove duplicates
     build_group = list(set(build_group))
@@ -626,7 +628,8 @@ while done is False:
             if code != "ok":
                 break
             if not re.match("^[a-zA-Z0-9_-]+$", string):
-                err_msg = "Please use the following character set [a-zA-Z0-9_-]"
+                err_msg = \
+                        "Please use the following character set [a-zA-Z0-9_-]"
                 g.dialog.msgbox(err_msg, width=len(err_msg)+10)
                 continue
             break
@@ -673,7 +676,8 @@ while done is False:
     elif state == "DO_COPYFILES":
         if def_fname is None:
             def_fname = t.get_name()
-        utils.print_message(utils.logtype.INFO, "Working directory: " + root_path)
+        utils.print_message(utils.logtype.INFO,
+                            "Working directory: " + root_path)
         out_dir = root_path + "/out_" + def_fname
         out_dir = os.path.abspath(out_dir)
         utils.mkdir_p(out_dir)
@@ -681,7 +685,7 @@ while done is False:
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        out_dir = root_path +  "/out_" + def_fname
+        out_dir = root_path + "/out_" + def_fname
 
         required_toolchains = t.get_required_toolchains()
         try:
@@ -718,8 +722,8 @@ if done:
         utils.print_message(utils.logtype.INFO, line)
 
     if not t.fetch_only_run() and not utils.get_error_count():
-        utils.print_message(utils.logtype.INFO, "Output directory: ./"
-                            + os.path.relpath(out_dir))
+        utils.print_message(utils.logtype.INFO, "Output directory: ./" +
+                            os.path.relpath(out_dir))
 
 if build_log_file is not None:
     build_log_file.close()
