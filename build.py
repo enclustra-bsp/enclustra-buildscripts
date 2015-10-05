@@ -63,6 +63,7 @@ state = "INIT"
 done = False
 build_log_file = None
 tool_name = "Enclustra Build Environment"
+def_fname = None
 
 required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
@@ -135,6 +136,10 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
                     help='set device option by index, the default one will'
                     ' be used if not specified')
+
+parser.add_argument("-s", "--saved-config", action='store', required=False,
+                    dest='saved_config', metavar='cfg',
+                    help='use previously saved configuration file')
 
 parser.add_argument("-c", "--clean-all", action='store_true',
                     required=False, dest='clean_all',
@@ -214,6 +219,37 @@ elif args.clean_all is True:
     sys.exit(0)
 
 # if we're in console mode
+elif args.saved_config is not None:
+    if not os.path.isfile(args.saved_config):
+        utils.print_message(utils.logtype.ERROR,
+                            "Specified configuration file does not exist:",
+                            args.saved_config)
+        sys.exit(1)
+
+    def_fname = (args.saved_config.split("/")[-1]).split(".")[:-1][0]
+
+    utils.print_message(utils.logtype.INFO,
+                        "Using previously saved configuration file:",
+                        args.saved_config)
+
+    # initialize target
+    t = target.Target(root_path, master_repo_path, "",
+                      args.saved_config, "No name",
+                      debug_calls, utils)
+
+    # binaries have to be set by hand
+    if t.config.has_section("binaries") is True:
+        for b in t.config["binaries"]:
+            if t.config.getboolean("binaries", b):
+                t.set_binaries(t.config[b]["description"])
+                break
+
+    # set the project name
+    t.target_name = t.config["project"]["name"]
+    # set config path
+    t.config_path = root_path + t.config["project"]["path"]
+
+    state = "DO_FETCH"
 elif args.device is not None:
     # initialize target
     dev_path = root_path + "/targets/" + args.device
@@ -432,7 +468,6 @@ utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
 # Main loop
 g = None
-def_fname = None
 while done is False:
     used_previous_config = False
     if state == "INIT":
