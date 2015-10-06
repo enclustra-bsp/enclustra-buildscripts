@@ -58,6 +58,14 @@ class Target:
                     continue
                 subtargets.append(st[-1])
 
+            for s in self.targets[t]["build_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len(st) < 1:
+                    continue
+                subtargets.append(st[-1])
+
             self.config.set(key, "build_steps", ",".join(subtargets))
 
             if self.config.has_section("binaries") is True:
@@ -126,12 +134,31 @@ class Target:
                                           "box") is True:
                     target_helpbox = self.config[target + "-help"]["box"]
 
+            key = target + "-options"
             if self.config.has_section(target + "-build") is True:
                 for command in self.config[target + "-build"]:
-                    target_build_commands.append(self.config[str(target) +
-                                                 "-build"][command])
+                    subtarget = dict()
+                    subtarget['name'] = target + " " + command
+                    subtarget['cmd'] = self.config[str(target) +
+                                                   "-build"][command]
 
-            key = target + "-options"
+                    skey = "build_steps"
+
+                    subtarget['enabled'] = False
+
+                    if self.config.has_section(key) is False:
+                        subtarget['enabled'] = True
+                        target_build_commands.append(subtarget)
+                        continue
+                    if self.config.has_option(key, skey) is False:
+                        subtarget['enabled'] = True
+                        target_build_commands.append(subtarget)
+                        continue
+
+                    subtarget['enabled'] = command in self.config[key][skey]
+
+                    target_build_commands.append(subtarget)
+
             if self.config.has_section(target + "-parallelbuild") is True:
                 for command in self.config[target + "-parallelbuild"]:
                     subtarget = dict()
@@ -354,6 +381,8 @@ class Target:
                 continue
             for subt in (self.targets[target])["parallelbuild_commands"]:
                 build_opts.append([subt['name'], "", subt['enabled']])
+            for subt in (self.targets[target])["build_commands"]:
+                build_opts.append([subt['name'], "", subt['enabled']])
         return build_opts
 
     def get_subtargets(self, target):
@@ -362,7 +391,8 @@ class Target:
         if (self.targets[target])["build"] is True:
             for subt in (self.targets[target])["parallelbuild_commands"]:
                 build_opts.append(subt['name'])
-
+            for subt in (self.targets[target])["build_commands"]:
+                build_opts.append(subt['name'])
         return build_opts
 
     def validate_subtargets(self, subtargets):
@@ -372,6 +402,9 @@ class Target:
             for c in (self.targets[target])["parallelbuild_commands"]:
                 if c['name'] in subtargets:
                     invalid.remove(c['name'])
+            for c in (self.targets[target])["build_commands"]:
+                if c['name'] in subtargets:
+                    invalid.remove(c['name'])
         return invalid
 
     def set_build_opts(self, build_opts):
@@ -379,6 +412,8 @@ class Target:
             if (self.targets[target])["build"] is False:
                 continue
             for c in (self.targets[target])["parallelbuild_commands"]:
+                c['enabled'] = c['name'] in build_opts
+            for c in (self.targets[target])["build_commands"]:
                 c['enabled'] = c['name'] in build_opts
 
     def get_fetch(self):
@@ -655,8 +690,9 @@ class Target:
                         self.call_build_tool(subt['cmd'], target, nthreads)
 
                 # build targets
-                for command in (self.targets[target])["build_commands"]:
-                    self.call_build_tool(command, target, 0)
+                for subt in (self.targets[target])["build_commands"]:
+                    if subt['enabled']:
+                        self.call_build_tool(subt['cmd'], target, 0)
 
                 # restore original PATH
                 os.environ["PATH"] = orig_path
