@@ -50,13 +50,14 @@ class Target:
             self.config.set(key, "build", str(self.targets[t]["build"]))
 
             subtargets = []
+            subtargets_p = []
             for s in self.targets[t]["parallelbuild_commands"]:
                 if s["enabled"] is False:
                     continue
                 st = s["name"].split(" ")
                 if len(st) < 1:
                     continue
-                subtargets.append(st[-1])
+                subtargets_p.append(st[-1])
 
             for s in self.targets[t]["build_commands"]:
                 if s["enabled"] is False:
@@ -66,7 +67,11 @@ class Target:
                     continue
                 subtargets.append(st[-1])
 
-            self.config.set(key, "build_steps", ",".join(subtargets))
+            if len(subtargets) > 0:
+                self.config.set(key, "build_steps", ",".join(subtargets))
+            if len(subtargets_p) > 0:
+                self.config.set(
+                    key, "parallelbuild_steps", ",".join(subtargets_p))
 
             if self.config.has_section("binaries") is True:
                 for b in self.config["binaries"]:
@@ -166,7 +171,7 @@ class Target:
                     subtarget['cmd'] = self.config[str(target) +
                                                    "-parallelbuild"][command]
 
-                    skey = "build_steps"
+                    skey = "parallelbuild_steps"
 
                     subtarget['enabled'] = False
 
