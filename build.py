@@ -379,7 +379,7 @@ elif args.device is not None:
                                 ', '.join(invalid_targets))
             sys.exit(1)
     else:
-        t.set_build_all()
+        t.set_active_targets()
 
     if args.device_option is not None:
         binaries = t.get_marked_binaries()

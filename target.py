@@ -188,6 +188,7 @@ class Target:
             target_descriptor.update([("disable_fetch", False)])
             target_descriptor.update([("history", target_fetch_history)])
             target_descriptor.update([("build", target_build)])
+            target_descriptor.update([("active", target_active)])
             target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
@@ -384,7 +385,9 @@ class Target:
         fetch = []
         for target in self.targets:
             help_msg = "Fetch " + self.targets[target]["help"]
-            fetch.append([target, "", (self.targets[target])["fetch"],
+            fetch.append([target, "",
+                         (self.targets[target])["fetch"] and
+                         (self.targets[target])["active"],
                          help_msg])
         return fetch
 
@@ -431,7 +434,9 @@ class Target:
                 help_msg += " Choosing this target will disable building " +\
                             "of the " + self.targets[target]["disable"] + \
                             " target."
-            build.append([target, "", (self.targets[target])["build"],
+            build.append([target, "",
+                         (self.targets[target])["build"] and
+                         (self.targets[target])["active"],
                          help_msg])
         return build
 
@@ -453,10 +458,12 @@ class Target:
         # handle targets disabled by others
         self.handle_disable("build")
 
-    def set_build_all(self):
+    def set_active_targets(self):
         for target in self.targets:
-            (self.targets[target])["build"] = True
+            (self.targets[target])["fetch"] = (self.targets[target])["active"]
+            (self.targets[target])["build"] = (self.targets[target])["active"]
         # handle targets disabled by others
+        self.handle_disable("fetch")
         self.handle_disable("build")
 
     def set_not_build(self, build):
