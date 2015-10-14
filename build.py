@@ -134,6 +134,11 @@ parser.add_argument("--anti-unicorn", action='store_true',
                     required=False, dest='disable_colors',
                     help='disables colored output')
 
+parser.add_argument("--expert-mode", action='store_true',
+                    required=False, dest='expert_mode',
+                    help='expert mode: prepare the environment for building'
+                    ' the whole system manually')
+
 parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
                     help='set device option by index, the default one will'
@@ -648,9 +653,9 @@ while done is False:
         if g:
             subprocess.call("clear")
         t.do_fetch(git_use_depth, git_use_remote)
-        state = "DO_BUILD"
+        state = "DO_GET_TOOLCHAIN"
 
-    elif state == "DO_BUILD":
+    elif state == "DO_GET_TOOLCHAIN":
         required_toolchains = t.get_required_toolchains()
         try:
             toolchains_paths = utils.acquire_toolchains(required_toolchains,
@@ -663,6 +668,18 @@ while done is False:
             done = True
             continue
 
+        if args.expert_mode is True:
+            state = "EXPERT_MODE"
+        else:
+            state = "DO_BUILD"
+
+    elif state == "EXPERT_MODE":
+        utils.create_xpmode_script(root_path)
+        utils.print_message(utils.logtype.INFO,
+                "To enter Expert Mode run '. sources/xpmode_env.sh'")
+        sys.exit(0)
+
+    elif state == "DO_BUILD":
         t.do_build(toolchains_paths, nthreads)
         state = "HANDLE_BINARIES"
 

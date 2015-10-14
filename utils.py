@@ -298,3 +298,22 @@ class Utils:
     def deinit_sigint_handler(self):
         if self.sigint_orig_handler is not None:
             signal.signal(signal.SIGINT, self.sigint_orig_handler)
+
+    def create_xpmode_script(self, root_path):
+        sh_file = open(root_path + '/sources/xpmode_env.sh', 'w')
+        sh_file.write('echo \">>> Configuring environment...\"\n')
+        sh_file.write('export PATH=$PATH:' +
+                root_path + "/bin/arm-none-linux-gnueabi-static/bin:" +
+                root_path + "/bin/device-tree-compiler-i686-static:" +
+                root_path + "/bin/mkbootimage:"+
+                root_path + "/bin/uboot-tools-i686-static\n\n")
+
+        sh_file.write('export ARCH=arm\n')
+        sh_file.write('export CROSS_COMPILE=arm-none-linux-gnueabi-\n');
+        sh_file.write('export LOADADDR=0x8000\n\n')
+
+        sh_file.write('echo \">>> Switching to sources/ directory...\"\n')
+        sh_file.write('cd sources/\n\n')
+
+        sh_file.write('echo \">>> Good luck!"\n')
+        sh_file.close()
