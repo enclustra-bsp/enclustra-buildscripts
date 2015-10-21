@@ -362,8 +362,8 @@ class Target:
 
     def set_binaries(self, bin_desc):
         for binary in self.binaries:
-            if (self.binaries[binary])["description"] == bin_desc:
-                (self.binaries[binary])["chosen"] = True
+            (self.binaries[binary])["chosen"] = \
+                ((self.binaries[binary])["description"] == bin_desc)
 
     def get_fetch_opts(self):
         fetch_opts = []
