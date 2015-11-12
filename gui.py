@@ -29,6 +29,8 @@ class Gui:
         self.top = True
         self.bottom = False
         self.inifiles = list()
+        if os.path.isfile(workdir + "/build.ini"):
+            self.inifiles.append(workdir + "/build.ini")
         self.new_config_tag = "New configuration..."
 
     def show_welcome_screen(self, msg):

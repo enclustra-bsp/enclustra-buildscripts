@@ -57,7 +57,8 @@ except ImportError as e:
 registered_toolchains = dict()
 
 master_repo_name = "sources"
-root_path = os.path.abspath(os.path.dirname(sys.argv[0]))
+bscripts_path = os.path.abspath(os.path.dirname(sys.argv[0]))
+root_path= os.path.abspath(bscripts_path + "/..")
 master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
 done = False
@@ -195,7 +196,7 @@ except Exception as ext:
     sys.exit(1)
 
 
-revision = utils.get_git_revision(root_path).rstrip('\n')
+revision = utils.get_git_revision(bscripts_path).rstrip('\n')
 tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
@@ -262,6 +263,8 @@ elif args.device is not None:
     dev_path = root_path + "/targets/" + args.device
     parse_dir = root_path + "/targets"
     ini_files = list()
+    if os.path.isfile(parse_dir + "/build.ini"):
+        ini_files.append(parse_dir + "/build.ini")
     for directory in (str(args.device)).split("/"):
         parse_dir += "/" + directory
         if not os.path.exists(parse_dir):
