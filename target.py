@@ -20,7 +20,7 @@ import archive
 
 class Target:
     def __init__(self, root_path, master_repo_path, config_path, ini_files,
-                 target_name, debug_calls, utils):
+                 target_name, debug_calls, utils, history_path):
         self.config = configparser.ConfigParser()
         self.config.optionxform = str
         self.root_path = root_path
@@ -35,6 +35,7 @@ class Target:
         self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
+        self.history_path = history_path
         self.utils = utils
 
     def save_config(self, filename):
@@ -88,12 +89,11 @@ class Target:
 
             self.config.set("project", "path", relative_path)
 
-        history_path = os.path.expanduser("~") + "/.ebe/history/"
-        if not os.path.exists(history_path):
-            os.makedirs(history_path)
+        if not os.path.exists(self.history_path):
+            os.makedirs(self.history_path)
 
         try:
-            history_fname = history_path + filename + ".ini"
+            history_fname = self.history_path + "/" + filename + ".ini"
 
             cfgfile = open(history_fname, 'w')
             self.config.write(cfgfile)

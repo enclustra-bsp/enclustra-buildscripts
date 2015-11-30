@@ -171,6 +171,7 @@ if config.read(root_path + "/enclustra.ini") is None:
 try:
     manifest_repo = config['general']['manifest_repository']
     nthreads = config['general']['nthreads']
+    history_path = config['general']['history_path']
     debug_calls = config.getboolean('debug', 'debug-calls')
     utils.set_debug_calls(debug_calls)
     quiet_mode = config.getboolean('debug', 'quiet-mode')
@@ -197,7 +198,7 @@ except Exception as ext:
 
 
 revision = utils.get_git_revision(bscripts_path).rstrip('\n')
-tool_version = tool_name + " (v0.0-" + revision + " (beta))\n"\
+tool_version = tool_name + " (v0.0-" + revision + ")\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
     "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
@@ -243,7 +244,7 @@ elif args.saved_config is not None:
     # initialize target
     t = target.Target(root_path, master_repo_path, "",
                       args.saved_config, "No name",
-                      debug_calls, utils)
+                      debug_calls, utils, history_path)
 
     # binaries have to be set by hand
     if t.config.has_section("binaries") is True:
@@ -294,7 +295,7 @@ elif args.device is not None:
 
     device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
     t = target.Target(root_path, master_repo_path, dev_path, ini_files,
-                      device_name, debug_calls, utils)
+                      device_name, debug_calls, utils, history_path)
     # if list only
     if args.list_targets is True:
         targets_list = t.get_fetch()
@@ -487,7 +488,7 @@ while done is False:
         g = gui.Gui(root_path+"/targets")
         g.show_welcome_screen(welcome_msg)
 
-        history_path = os.path.expanduser("~") + "/.ebe/history/"
+        history_path = os.path.expanduser("~") + "/.ebe/" + history_path + "/"
 
         if os.path.exists(history_path) and os.listdir(history_path):
             state = "HISTORY_MENU"
@@ -496,7 +497,7 @@ while done is False:
 
     if state == "HISTORY_MENU":
         cfg = []
-        dirpath = os.path.expanduser("~") + "/.ebe/history/"
+        dirpath = history_path
         entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
         entries = ((os.stat(path), path) for path in entries)
         entries = ((stat[ST_MTIME], path)
@@ -513,11 +514,11 @@ while done is False:
             else:
                 used_previous_config = True
                 def_fname = tag
-                dirpath = os.path.expanduser("~") + "/.ebe/history/"
+                dirpath = history_path
                 # initialize target
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
-                                  dirpath + tag + ".ini",
-                                  "No name", debug_calls, utils)
+                                  dirpath + tag + ".ini", "No name",
+                                  debug_calls, utils, history_path)
 
                 # binaries have to be set by hand
                 if t.config.has_section("binaries") is True:
@@ -550,7 +551,7 @@ while done is False:
             # initialize target
             t = target.Target(root_path, master_repo_path, g.get_workdir(),
                               g.get_inifiles(), g.get_target_name(),
-                              debug_calls, utils)
+                              debug_calls, utils, history_path)
 
     elif state == "FETCH_MENU":
         code, tags = g.show_fetch_menu(t.get_fetch())
