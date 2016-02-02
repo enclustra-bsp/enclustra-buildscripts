@@ -538,8 +538,6 @@ class Target:
             with self.utils.cd(self.master_repo_path):
                 sp = self.utils.call_tool(call)
             if sp != 0:
-                # if fetching failed unmark this target from building
-                (self.targets[target])["build"] = False
                 self.utils.print_message(self.utils.logtype.WARNING,
                                          "Repository initialization for",
                                          target, "failed")
@@ -553,8 +551,6 @@ class Target:
             with self.utils.cd(self.master_repo_path):
                 sp = self.utils.call_tool(call)
             if sp != 0:
-                # if fetching failed unmark this target from building
-                (self.targets[target])["build"] = False
                 self.utils.print_message(self.utils.logtype.WARNING,
                                          "Fetching for", target, "failed")
                 continue
@@ -575,8 +571,6 @@ class Target:
                     with self.utils.cd(repo_dir):
                         sp = self.utils.call_tool(call)
             if sp != 0:
-                # if fetching failed unmark this target from building
-                (self.targets[target])["build"] = False
                 self.utils.print_message(self.utils.logtype.WARNING,
                                          "Fetching for", target, "failed")
                 continue
