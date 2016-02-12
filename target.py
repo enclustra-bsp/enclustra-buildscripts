@@ -746,12 +746,12 @@ class Target:
                 continue
             # download binary
             binary_file = os.path.basename(self.binaries[binary]["uri"])
-            call = "wget "
+            call = "curl -O "
             if self.binaries[binary]["redownload"] is False:
-                call = call + "-N "
+                call = call + "-z " + download_path + "/" + binary_file
             elif os.path.isfile(download_path + "/" + binary_file):
                 os.remove(download_path + "/" + binary_file)
-            call = call + self.binaries[binary]["uri"]
+            call = call + " " + self.binaries[binary]["uri"]
             with self.utils.cd(download_path):
                 sp = self.utils.call_tool(call)
             if sp != 0:
