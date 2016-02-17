@@ -384,7 +384,8 @@ elif args.device is not None:
         t.set_build(build_group)
 
         invalid_targets = t.validate_subtargets(build_opts)
-        t.set_build_opts(build_opts)
+        if len(build_opts) > 0:
+            t.set_build_opts(build_opts)
         if len(invalid_targets) > 0:
             utils.print_message(utils.logtype.ERROR,
                                 "Invalid targets specified:",
