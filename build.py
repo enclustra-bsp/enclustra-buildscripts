@@ -469,7 +469,7 @@ if pull is True:
         sp = utils.call_tool(call)
 # clone new
 else:
-    call = "git clone " + manifest_repo + " " + master_repo_path
+    call = "git clone " + manifest_repo + " \"" + master_repo_path + "\""
     sp = utils.call_tool(call)
 if sp != 0:
     utils.print_message(utils.logtype.ERROR,
