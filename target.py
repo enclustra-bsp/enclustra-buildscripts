@@ -72,20 +72,20 @@ class Target:
             self.config.set(key, "build_steps", ",".join(subtargets))
             self.config.set(key, "parallelbuild_steps", ",".join(subtargets_p))
 
-            if self.config.has_section("binaries") is True:
-                for b in self.config["binaries"]:
-                    self.config.set("binaries", b,
-                                    str(self.binaries[b]["chosen"]))
+        if self.config.has_section("binaries") is True:
+            for b in self.config["binaries"]:
+                self.config.set("binaries", b,
+                                str(self.binaries[b]["chosen"]))
 
-            # set project name
-            if self.config.has_section("project") is False:
-                self.config.add_section("project")
+        # set project name
+        if self.config.has_section("project") is False:
+            self.config.add_section("project")
 
-            self.config.set("project", "name", self.get_name())
+        self.config.set("project", "name", self.get_name())
 
-            relative_path = self.config_path[len(self.root_path):]
+        relative_path = self.config_path[len(self.root_path):]
 
-            self.config.set("project", "path", relative_path)
+        self.config.set("project", "path", relative_path)
 
         if not os.path.exists(self.history_path):
             os.makedirs(self.history_path)
