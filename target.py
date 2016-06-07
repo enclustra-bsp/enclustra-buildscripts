@@ -193,6 +193,46 @@ class Target:
             self.utils.print_message(self.utils.logtype.WARNING,
                                      "Failed to save project files.")
 
+    def resave_project(self, filename, fpath):
+        for t in self.targets:
+            # only update options
+            key = t + "-options"
+            if self.config.has_section(key) is False:
+                self.config.add_section(key)
+
+            subtargets = []
+            subtargets_p = []
+            for s in self.targets[t]["parallelbuild_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len(st) < 1:
+                    continue
+                subtargets_p.append(st[-1])
+
+            for s in self.targets[t]["build_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len(st) < 1:
+                    continue
+                subtargets.append(st[-1])
+
+            self.config.set(key, "build_steps", ",".join(subtargets))
+            self.config.set(key, "parallelbuild_steps", ",".join(subtargets_p))
+
+        try:
+            project_fname = fpath + "/" + filename + ".ini"
+
+            cfgfile = open(project_fname, 'w')
+            self.config.write(cfgfile)
+            self.utils.print_message(self.utils.logtype.INFO,
+                                     "Project file saved.")
+            cfgfile.close()
+        except:
+            self.utils.print_message(self.utils.logtype.WARNING,
+                                     "Failed to save project files.")
+
     def get_name(self):
         return self.target_name
 

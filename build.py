@@ -775,13 +775,21 @@ while done is False:
             continue
 
         t.do_generate_image(out_dir, toolchains)
-        if project_mode_save:
+        if project_mode_save or (project_file is not None):
             state = "GENERATE_PROJECT"
         else:
             done = True
 
     elif state == "GENERATE_PROJECT":
+        done = True
         out_dir = root_path + "/out_" + def_fname
+
+        # if we are building project, then only update the ini file
+        if project_file is not None:
+            t.resave_project(def_fname, out_dir)
+            continue
+
+        # elsewise, generate it from scratch
         copy_targets = [tar for tar in t.get_fetch() if tar[2]]
         for tar in copy_targets:
             src_dir = t.master_repo_path + "/" + t.targets[tar[0]]["repository"]
@@ -792,7 +800,6 @@ while done is False:
             t.do_custom_cmd(toolchains, tar_dir, call)
 
         t.save_project(def_fname, out_dir)
-        done = True
 
 if done:
     utils.print_message(utils.logtype.INFO, "-" * 80)
