@@ -120,9 +120,9 @@ class Target:
             target_helpbox = None
             target_disable = None
             target_branch = None
-            target_fetch = True
+            target_fetch = False
             target_fetch_history = False
-            target_build = True
+            target_build = False
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
 
