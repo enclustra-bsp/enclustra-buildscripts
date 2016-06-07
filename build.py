@@ -65,6 +65,8 @@ done = False
 build_log_file = None
 tool_name = "Enclustra Build Environment"
 def_fname = None
+project_file = None
+project_mode_save = False
 
 required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["git",    "--version", 3, "1.7.8"],
@@ -144,6 +146,10 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
                     dest='device_option', metavar='index',
                     help='set device option by index, the default one will'
                     ' be used if not specified')
+
+parser.add_argument("--build-project", action='store', required=False,
+                    dest='build_project', metavar='project_file',
+                    help='build project')
 
 parser.add_argument("-s", "--saved-config", action='store', required=False,
                     dest='saved_config', metavar='cfg',
@@ -259,6 +265,34 @@ elif args.saved_config is not None:
     t.config_path = root_path + t.config["project"]["path"]
 
     state = "DO_FETCH"
+
+elif args.build_project is not None:
+
+    project_file = args.build_project
+    if not os.path.isfile(project_file):
+        utils.print_message(utils.logtype.ERROR,
+                            "Project file does not exist:",
+                            project_file)
+        sys.exit(1)
+
+    def_fname = (project_file.split("/")[-1]).split(".")[:-1][0]
+
+    utils.print_message(utils.logtype.INFO,
+                        "Using project file:",
+                        project_file)
+
+    # initialize target
+    t = target.Target(root_path,
+                      os.path.dirname(project_file), "",
+                      project_file, "No name",
+                      debug_calls, utils,
+                      os.path.dirname(project_file))
+
+    # set the project name
+    t.target_name = t.config["project"]["name"]
+
+    state = "INIT"
+
 elif args.device is not None:
     # initialize target
     dev_path = root_path + "/targets/" + args.device
@@ -491,7 +525,9 @@ while done is False:
 
         history_path = os.path.expanduser("~") + "/.ebe/" + history_path + "/"
 
-        if os.path.exists(history_path) and os.listdir(history_path):
+        if project_file:
+            state = "BUILD_MENU"
+        elif os.path.exists(history_path) and os.listdir(history_path):
             state = "HISTORY_MENU"
         else:
             state = "TARGET_MENU"
@@ -578,7 +614,9 @@ while done is False:
         code, tags = g.show_build_menu(t.get_build())
         if code == "ok":
             t.set_build(tags)
-            if not t.fetch_only_run():
+            if project_file is not None:
+                state = "DO_GET_TOOLCHAIN"
+            elif not t.fetch_only_run():
                 state = "BINARIES_MENU"
             else:
                 state = "SHOW_SUMMARY"
@@ -592,6 +630,9 @@ while done is False:
                 t.set_build_opts(subtags)
                 continue
         elif code in ("cancel", "esc"):
+            if project_file is not None:
+                subprocess.call("clear")
+                sys.exit(0)
             state = "FETCH_MENU"
         continue
 
@@ -638,6 +679,11 @@ while done is False:
 
         while True:
             code, string = g.show_history_fname_dialog(string)
+            if code == "extra":
+                code = g.show_project_menu()
+                if "enable" in code[1]:
+                    project_mode_save = True
+                continue
             if code != "ok":
                 break
             if not re.match("^[a-zA-Z0-9_-]+$", string):
@@ -649,8 +695,9 @@ while done is False:
 
         def_fname = string
         if code == "ok":
-            # save config
-            t.save_config(def_fname)
+            # save config (in project mode config is saved as the last step)
+            if not project_mode_save:
+                t.save_config(def_fname)
         else:
             def_fname = t.get_name()
 
@@ -664,6 +711,9 @@ while done is False:
         state = "DO_GET_TOOLCHAIN"
 
     elif state == "DO_GET_TOOLCHAIN":
+        if g and project_file:
+            subprocess.call("clear")
+
         required_toolchains = t.get_required_toolchains()
         try:
             toolchains_paths = utils.acquire_toolchains(required_toolchains,
@@ -725,6 +775,23 @@ while done is False:
             continue
 
         t.do_generate_image(out_dir, toolchains)
+        if project_mode_save:
+            state = "GENERATE_PROJECT"
+        else:
+            done = True
+
+    elif state == "GENERATE_PROJECT":
+        out_dir = root_path + "/out_" + def_fname
+        copy_targets = [tar for tar in t.get_fetch() if tar[2]]
+        for tar in copy_targets:
+            src_dir = t.master_repo_path + "/" + t.targets[tar[0]]["repository"]
+            tar_dir = out_dir + "/" + t.targets[tar[0]]["repository"]
+            call = "git clone " + src_dir + " " + tar_dir
+            utils.call_tool(call)
+            call = "git remote remove origin"
+            t.do_custom_cmd(toolchains, tar_dir, call)
+
+        t.save_project(def_fname, out_dir)
         done = True
 
 if done:

@@ -14,6 +14,7 @@
 import configparser
 import os
 import sys
+import stat
 import shutil
 import archive
 
@@ -102,6 +103,101 @@ class Target:
         except:
             self.utils.print_message(self.utils.logtype.WARNING,
                                      "Failed to save history file.")
+
+    def save_project(self, filename, fpath):
+        for t in self.targets:
+            # do not save targets that were not marked to be fetched
+            if not self.targets[t]["fetch"]:
+                if self.config.has_section(t):
+                    self.config.remove_section(t)
+                extra_sects = [ "build", "parallelbuild",
+                                "help", "copyfiles", "scripts"]
+                for e in extra_sects:
+                    if self.config.has_section(t + "-" + e):
+                        self.config.remove_section(t + "-" + e)
+
+                if self.config.has_option("targets", t):
+                    self.config.remove_option("targets", t)
+
+                continue
+            key = t + "-options"
+            if self.config.has_section(key) is False:
+                self.config.add_section(key)
+
+            self.config.set(key, "build", str(False))
+
+            subtargets = []
+            subtargets_p = []
+            for s in self.targets[t]["parallelbuild_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len(st) < 1:
+                    continue
+                subtargets_p.append(st[-1])
+
+            for s in self.targets[t]["build_commands"]:
+                if s["enabled"] is False:
+                    continue
+                st = s["name"].split(" ")
+                if len(st) < 1:
+                    continue
+                subtargets.append(st[-1])
+
+            if len(subtargets) > 0:
+                self.config.set(key, "build_steps", ",".join(subtargets))
+            if len(subtargets_p) > 0:
+                self.config.set(
+                    key, "parallelbuild_steps", ",".join(subtargets_p))
+
+        # cleanup the ini file to the required minimum
+        if self.config.has_section("binaries") is True:
+            for s in self.config["binaries"]:
+                if self.config.has_section(s):
+                    self.config.remove_section(s)
+                if self.config.has_section(s + "-copyfiles"):
+                    self.config.remove_section(s + "-copyfiles")
+            self.config.remove_section("binaries")
+
+        if self.config.has_section("targets"):
+            for t in self.config["targets"]:
+                if self.config.has_section(t + "-scripts"):
+                    self.config.remove_section(t + "-scripts")
+
+        # set project name
+        if self.config.has_section("project") is False:
+            self.config.add_section("project")
+
+        self.config.set("project", "name", self.get_name())
+
+        relative_path = self.config_path[len(self.root_path):]
+
+        self.config.set("project", "path", relative_path)
+
+        if not os.path.exists(fpath):
+            os.makedirs(fpath)
+
+        try:
+            project_fname = fpath + "/" + filename + ".ini"
+            script_fname = fpath + "/" + "build.sh"
+
+            cfgfile = open(project_fname, 'w')
+            self.config.write(cfgfile)
+            self.utils.print_message(self.utils.logtype.INFO,
+                                     "Project file saved.")
+            cfgfile.close()
+
+            bfile = open(script_fname, 'w')
+            bfile.write("#!/bin/bash\n\n")
+            bfile.write("cd ..\n")
+            bfile.write("./build.sh --build-project " + project_fname + "\n")
+            bfile.close()
+
+            bfile_mode = os.stat(script_fname).st_mode
+            os.chmod(script_fname, bfile_mode | stat.S_IEXEC)
+        except:
+            self.utils.print_message(self.utils.logtype.WARNING,
+                                     "Failed to save project files.")
 
     def get_name(self):
         return self.target_name

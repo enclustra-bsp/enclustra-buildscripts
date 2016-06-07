@@ -228,4 +228,11 @@ class Gui:
 
         return self.dialog.inputbox("Save configuration file...",
                                     init=def_name, width=width,
+                                    extra_button=True,
+                                    extra_label="Advanced",
                                     cancel_label="Build without saving")
+
+    def show_project_menu(self):
+        msg = "If you intend to modify the sources in the future, enable project mode"
+        return self.dialog.checklist(msg,
+                                     choices=[("enable", "", False)])
