@@ -69,11 +69,8 @@ class Target:
                     continue
                 subtargets.append(st[-1])
 
-            if len(subtargets) > 0:
-                self.config.set(key, "build_steps", ",".join(subtargets))
-            if len(subtargets_p) > 0:
-                self.config.set(
-                    key, "parallelbuild_steps", ",".join(subtargets_p))
+            self.config.set(key, "build_steps", ",".join(subtargets))
+            self.config.set(key, "parallelbuild_steps", ",".join(subtargets_p))
 
             if self.config.has_section("binaries") is True:
                 for b in self.config["binaries"]:
@@ -144,11 +141,8 @@ class Target:
                     continue
                 subtargets.append(st[-1])
 
-            if len(subtargets) > 0:
-                self.config.set(key, "build_steps", ",".join(subtargets))
-            if len(subtargets_p) > 0:
-                self.config.set(
-                    key, "parallelbuild_steps", ",".join(subtargets_p))
+            self.config.set(key, "build_steps", ",".join(subtargets))
+            self.config.set(key, "parallelbuild_steps", ",".join(subtargets_p))
 
         # cleanup the ini file to the required minimum
         if self.config.has_section("binaries") is True:
