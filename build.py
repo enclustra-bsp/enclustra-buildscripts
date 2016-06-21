@@ -86,6 +86,10 @@ parser = argparse.ArgumentParser(description=tool_name, prog='tool',
                                      prog,
                                      max_help_position=32))
 
+parser.add_argument("--release", action='store',
+                    required=False, dest='bs_release', metavar='ver',
+                    help='specify release version of the buidscripts')
+
 parser.add_argument("-L", "--list-devices", action='store_true',
                     required=False, dest='list_devices',
                     help='list all available devices')
@@ -215,6 +219,14 @@ args = parser.parse_args()
 if args.disable_colors is True:
     utils.set_colors(False)
 
+# figure out release version
+if args.bs_release:
+    release = args.bs_release
+    sys.argv.remove('--release')
+    sys.argv.remove(args.bs_release)
+else:
+    release = 'master'
+
 if args.version is True:
     print(str("\n" + tool_version + "\n"))
     sys.exit(0)
@@ -250,7 +262,8 @@ elif args.saved_config is not None:
     # initialize target
     t = target.Target(root_path, master_repo_path, "",
                       args.saved_config, "No name",
-                      debug_calls, utils, history_path)
+                      debug_calls, utils, history_path,
+                      release)
 
     # binaries have to be set by hand
     if t.config.has_section("binaries") is True:
@@ -286,7 +299,8 @@ elif args.build_project is not None:
                       os.path.dirname(project_file), "",
                       project_file, "No name",
                       debug_calls, utils,
-                      os.path.dirname(project_file))
+                      os.path.dirname(project_file),
+                      release)
 
     # set the project name
     t.target_name = t.config["project"]["name"]
@@ -329,7 +343,8 @@ elif args.device is not None:
 
     device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
     t = target.Target(root_path, master_repo_path, dev_path, ini_files,
-                      device_name, debug_calls, utils, history_path)
+                      device_name, debug_calls, utils, history_path,
+                      release)
     # if list only
     if args.list_targets is True:
         targets_list = t.get_fetch()
@@ -555,7 +570,8 @@ while done is False:
                 # initialize target
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
                                   dirpath + tag + ".ini", "No name",
-                                  debug_calls, utils, history_path)
+                                  debug_calls, utils, history_path,
+                                  release)
 
                 # binaries have to be set by hand
                 if t.config.has_section("binaries") is True:
@@ -588,7 +604,7 @@ while done is False:
             # initialize target
             t = target.Target(root_path, master_repo_path, g.get_workdir(),
                               g.get_inifiles(), g.get_target_name(),
-                              debug_calls, utils, history_path)
+                              debug_calls, utils, history_path, release)
 
     elif state == "FETCH_MENU":
         code, tags = g.show_fetch_menu(t.get_fetch())

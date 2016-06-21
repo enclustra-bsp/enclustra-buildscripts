@@ -21,7 +21,7 @@ import archive
 
 class Target:
     def __init__(self, root_path, master_repo_path, config_path, ini_files,
-                 target_name, debug_calls, utils, history_path):
+                 target_name, debug_calls, utils, history_path, release):
         self.config = configparser.ConfigParser()
         self.config.optionxform = str
         self.root_path = root_path
@@ -33,6 +33,7 @@ class Target:
         self.binaries = dict()
         self.bootimages = dict()
         self.clean = dict()
+        self.release = release
         self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
@@ -258,6 +259,8 @@ class Target:
 
             if self.config.has_option(target, "branch") is True:
                 target_branch = self.config[target]["branch"]
+            else:
+                target_branch = self.release
 
             if self.config.has_option(target, "disables") is True:
                 target_disable = self.config[target]["disables"]
