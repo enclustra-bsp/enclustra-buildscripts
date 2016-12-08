@@ -702,9 +702,9 @@ while done is False:
                 continue
             if code != "ok":
                 break
-            if not re.match("^[a-zA-Z0-9_-+]+$", string):
+            if not re.match("^[a-zA-Z0-9_+-]+$", string):
                 err_msg = \
-                        "Please use the following character set [a-zA-Z0-9_-+]"
+                        "Please use the following character set [a-zA-Z0-9_+-]"
                 g.dialog.msgbox(err_msg, width=len(err_msg)+10)
                 continue
             break
