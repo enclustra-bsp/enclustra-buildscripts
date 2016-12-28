@@ -426,7 +426,7 @@ elif args.device is not None:
                         utils.acquire_toolchains(t.get_required_toolchains(),
                                                  registered_toolchains,
                                                  root_path, debug_calls))
-        sys.exit(1)
+        sys.exit(0)
 
     if fetch_group or build_group:
         t.set_fetch(fetch_group)
