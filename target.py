@@ -557,10 +557,11 @@ class Target:
     def get_fetch(self):
         fetch = []
         for target in self.targets:
+            if not self.targets[target]["active"]:
+                continue
             help_msg = "Fetch " + self.targets[target]["help"]
             fetch.append([target, "",
-                         (self.targets[target])["fetch"] and
-                         (self.targets[target])["active"],
+                         (self.targets[target])["fetch"],
                          help_msg])
         return fetch
 
@@ -602,14 +603,15 @@ class Target:
     def get_build(self):
         build = []
         for target in self.targets:
+            if not self.targets[target]["active"]:
+                continue
             help_msg = "Build " + self.targets[target]["help"]
             if self.targets[target]["disable"] is not None:
                 help_msg += " Choosing this target will disable building " +\
                             "of the " + self.targets[target]["disable"] + \
                             " target."
             build.append([target, "",
-                         (self.targets[target])["build"] and
-                         (self.targets[target])["active"],
+                         (self.targets[target])["build"],
                          help_msg])
         return build
 
