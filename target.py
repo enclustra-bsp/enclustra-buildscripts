@@ -108,8 +108,8 @@ class Target:
             if not self.targets[t]["fetch"]:
                 if self.config.has_section(t):
                     self.config.remove_section(t)
-                extra_sects = [ "build", "parallelbuild",
-                                "help", "copyfiles", "scripts"]
+                extra_sects = ["build", "parallelbuild",
+                               "help", "copyfiles", "scripts"]
                 for e in extra_sects:
                     if self.config.has_section(t + "-" + e):
                         self.config.remove_section(t + "-" + e)

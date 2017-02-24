@@ -58,7 +58,7 @@ registered_toolchains = dict()
 
 master_repo_name = "sources"
 bscripts_path = os.path.abspath(os.path.dirname(sys.argv[0]))
-root_path= os.path.abspath(bscripts_path + "/..")
+root_path = os.path.abspath(bscripts_path + "/..")
 master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
 done = False
@@ -752,7 +752,7 @@ while done is False:
     elif state == "EXPERT_MODE":
         utils.create_xpmode_script(root_path)
         utils.print_message(utils.logtype.INFO,
-                "To enter Expert Mode run '. sources/xpmode_env.sh'")
+                            "To use Expert Mode run '. sources/xpmode_env.sh'")
         sys.exit(0)
 
     elif state == "DO_BUILD":
@@ -810,7 +810,8 @@ while done is False:
         # elsewise, generate it from scratch
         copy_targets = [tar for tar in t.get_fetch() if tar[2]]
         for tar in copy_targets:
-            src_dir = t.master_repo_path + "/" + t.targets[tar[0]]["repository"]
+            src_dir = t.master_repo_path + "/" + \
+                      t.targets[tar[0]]["repository"]
             tar_dir = out_dir + "/" + t.targets[tar[0]]["repository"]
             call = "git clone " + src_dir + " " + tar_dir
             utils.call_tool(call)

@@ -303,13 +303,13 @@ class Utils:
         sh_file = open(root_path + '/sources/xpmode_env.sh', 'w')
         sh_file.write('echo \">>> Configuring environment...\"\n')
         sh_file.write('export PATH=$PATH:' +
-                root_path + "/bin/arm-none-linux-gnueabi-static/bin:" +
-                root_path + "/bin/device-tree-compiler-i686-static:" +
-                root_path + "/bin/mkbootimage:"+
-                root_path + "/bin/uboot-tools-i686-static\n\n")
+                      root_path + "/bin/arm-none-linux-gnueabi-static/bin:" +
+                      root_path + "/bin/device-tree-compiler-i686-static:" +
+                      root_path + "/bin/mkbootimage:" +
+                      root_path + "/bin/uboot-tools-i686-static\n\n")
 
         sh_file.write('export ARCH=arm\n')
-        sh_file.write('export CROSS_COMPILE=arm-none-linux-gnueabi-\n');
+        sh_file.write('export CROSS_COMPILE=arm-none-linux-gnueabi-\n')
         sh_file.write('export LOADADDR=0x8000\n\n')
 
         sh_file.write('echo \">>> Switching to sources/ directory...\"\n')

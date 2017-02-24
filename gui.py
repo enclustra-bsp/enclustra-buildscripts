@@ -233,6 +233,6 @@ class Gui:
                                     cancel_label="Build without saving")
 
     def show_project_menu(self):
-        msg = "If you intend to modify the sources in the future, enable project mode"
+        msg = "If you intend to modify the sources, enable project mode"
         return self.dialog.checklist(msg,
                                      choices=[("enable", "", False)])
