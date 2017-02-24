@@ -523,7 +523,12 @@ else:
 if sp != 0:
     utils.print_message(utils.logtype.WARNING,
                         "Fetching master repository failed!")
-    if raw_input("Continue anyway? (Y/n) ").lower() == 'n':
+    # python3 compatibility (raw_input vs input)
+    try:
+        input = raw_input
+    except NameError:
+        pass
+    if input("Continue anyway? (Y/n) ").lower() == 'n':
         sys.exit(1)
 
 
