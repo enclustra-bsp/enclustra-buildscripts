@@ -825,7 +825,7 @@ if done:
     if utils.get_error_count():
         utils.print_message(utils.logtype.ERROR, "BUILD FAILED")
     else:
-        msg = "BUILD_SUCCEEDED"
+        msg = "BUILD SUCCEEDED"
         msg_type = utils.logtype.INFO
         if utils.get_warning_count():
             msg += " with " + str(utils.get_warning_count())
