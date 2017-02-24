@@ -521,9 +521,11 @@ else:
     call = "git clone " + manifest_repo + " \"" + master_repo_path + "\""
     sp = utils.call_tool(call)
 if sp != 0:
-    utils.print_message(utils.logtype.ERROR,
+    utils.print_message(utils.logtype.WARNING,
                         "Fetching master repository failed!")
-    sys.exit(1)
+    if raw_input("Continue anyway? (Y/n) ").lower() == 'n':
+        sys.exit(1)
+
 
 # welcome msg
 welcome_msg = tool_version
