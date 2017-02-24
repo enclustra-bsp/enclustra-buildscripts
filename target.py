@@ -890,9 +890,23 @@ class Target:
             with self.utils.cd(download_path):
                 sp = self.utils.call_tool(call)
             if sp != 0:
-                self.utils.print_message(self.utils.logtype.ERROR,
-                                         "Error while downloading",
-                                         binary, "binary")
+                # We could not download file, check if an older version exist
+                can_use_older = True
+                for cp_file in self.binaries[binary]['copy_files']:
+                    if not os.path.exists(download_path + "/" + cp_file[1]):
+                        can_use_older = False
+                        break
+
+                if can_use_older:
+                    self.utils.print_message(self.utils.logtype.WARNING,
+                                             "Could not check for an updated",
+                                             binary,
+                                             "binary, using an older version")
+                else:
+                    self.utils.print_message(self.utils.logtype.ERROR,
+                                             "Error while downloading",
+                                             binary,
+                                             "binary")
                 continue
             # unpack binary (if required)
             if self.binaries[binary]["unpack"] is True:
