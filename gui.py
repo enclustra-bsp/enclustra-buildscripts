@@ -8,7 +8,7 @@
 # \author Karol Gugala <kgugala@antmicro.com>
 # \date 2015-07-03
 #
-# \copyright Copyright (c) 2015 Enclustra GmbH, Switzerland. All rights reserved.
+# \copyright Copyright (c) 2015-2017 Enclustra GmbH, Switzerland. All rights reserved.
 # \licence This code is released under the Modified BSD licence.
 
 import os

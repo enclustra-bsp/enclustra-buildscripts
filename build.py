@@ -8,7 +8,7 @@
 # \author Karol Gugala <kgugala@antmicro.com>
 # \date 2015-07-03
 #
-# \copyright Copyright (c) 2015 Enclustra GmbH, Switzerland. All rights reserved.
+# \copyright Copyright (c) 2015-2017 Enclustra GmbH, Switzerland. All rights reserved.
 # \licence This code is released under the Modified BSD licence.
 
 # Check project dependencies
@@ -211,7 +211,7 @@ revision = utils.get_git_revision(bscripts_path).rstrip('\n')
 tool_version = tool_name + " (v0.0-" + revision + ")\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
-    "\n\nCopyright (c) 2015 Enclustra GmbH, Switzerland." \
+    "\n\nCopyright (c) 2015-2017 Enclustra GmbH, Switzerland." \
     "\nAll rights reserved."
 
 args = parser.parse_args()
