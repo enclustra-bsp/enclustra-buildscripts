@@ -61,6 +61,7 @@ bscripts_path = os.path.abspath(os.path.dirname(sys.argv[0]))
 root_path = os.path.abspath(bscripts_path + "/..")
 master_repo_path = root_path + "/" + master_repo_name
 state = "INIT"
+init_state = "INIT"
 done = False
 build_log_file = None
 tool_name = "Enclustra Build Environment"
@@ -548,11 +549,11 @@ while done is False:
         history_path = os.path.expanduser("~") + "/.ebe/" + history_path + "/"
 
         if project_file:
-            state = "BUILD_MENU"
+            init_state = state = "BUILD_MENU"
         elif os.path.exists(history_path) and os.listdir(history_path):
-            state = "HISTORY_MENU"
+            init_state = state = "HISTORY_MENU"
         else:
-            state = "TARGET_MENU"
+            init_state = state = "TARGET_MENU"
 
     if state == "HISTORY_MENU":
         cfg = []
@@ -601,11 +602,13 @@ while done is False:
         # show main menu
         code = "ok"
         while code == "ok":
-            code = g.show_level_menu()
+            code = g.show_level_menu(init_state == "TARGET_MENU" and g.top)
             continue
         if code == "exit":
             subprocess.call("clear")
             sys.exit(0)
+        elif code == "back":
+            state = init_state
         elif code == "done":
             state = "FETCH_MENU"
             # initialize target

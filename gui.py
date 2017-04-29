@@ -103,7 +103,7 @@ class Gui:
         else:
             return (description, choices)
 
-    def show_level_menu(self):
+    def show_level_menu(self, exit_label=False):
         tagmap = dict()
         try:
             description, choices = self.get_choices()
@@ -117,7 +117,7 @@ class Gui:
             choice[0] = choice[0].replace("_", " ")
 
         code, tag = self.dialog.menu(description, choices=choices,
-                                     cancel_label="Back")
+                                     cancel_label="Exit" if exit_label else "Back")
         if code == self.dialog.OK:
             # restore the original key from before underscore substitution
             tag = tagmap[tag]
@@ -125,8 +125,10 @@ class Gui:
             if self.bottom is True:
                 return "done"
         else:
-            if self.top is True:
+            if exit_label is True:
                 return "exit"
+            elif self.top is True:
+                return "back"
             self.step_out()
         return "ok"
 
