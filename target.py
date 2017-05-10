@@ -17,6 +17,7 @@ import sys
 import stat
 import shutil
 import archive
+import copy
 
 
 class Target:
@@ -77,7 +78,12 @@ class Target:
             for b in self.config["binaries"]:
                 self.config.set("binaries", b,
                                 str(self.binaries[b]["chosen"]))
-
+                # check if copyfiles were modifies
+                # and update config as necessary
+                if self.is_copyfiles_modified(b):
+                    for i, copyfile in enumerate(self.config[b+"-copyfiles"]):
+                        self.config.set(b+"-copyfiles", copyfile,
+                                        self.binaries[b]["copy_files"][i][1])
         # set project name
         if self.config.has_section("project") is False:
             self.config.add_section("project")
@@ -376,6 +382,8 @@ class Target:
             for binary in self.config["binaries"]:
                 binary_descriptor = dict()
                 binary_copyfiles = []
+                binary_copyfiles_init = []
+                binary_copyfiles_def = []
 
                 is_default = self.config.getboolean("binaries", binary)
                 download_uri = self.config[binary]["url"]
@@ -399,6 +407,24 @@ class Target:
                     binary_copyfiles.append([copyfile,
                                              self.config[binary + "-copyfiles"]
                                              [copyfile]])
+                binary_copyfiles_init = copy.deepcopy(binary_copyfiles)
+
+                if self.config.has_section(binary+"-copyfiles-default"):
+                    for copyf_def in self.config[binary+"-copyfiles-default"]:
+                        binary_copyfiles_def.append([copyf_def,
+                                                    self.config[binary +
+                                                     "-copyfiles-default"]
+                                                     [copyf_def]])
+                else:
+                    # no default section for copyfiles
+                    # set current copyfiles to be default
+                    # and update config section
+                    binary_copyfiles_def = copy.deepcopy(binary_copyfiles)
+                    self.config.add_section(binary+"-copyfiles-default")
+                    for copyfile in self.config[binary+"-copyfiles"]:
+                        self.config.set(binary+"-copyfiles-default", copyfile,
+                                        self.config[binary + "-copyfiles"]
+                                        [copyfile])
 
                 binary_descriptor.update([("default", is_default)])
                 binary_descriptor.update([("description", description)])
@@ -408,6 +434,10 @@ class Target:
                 binary_descriptor.update([("redownload", redownload)])
                 binary_descriptor.update([("shortname", shortname)])
                 binary_descriptor.update([("copy_files", binary_copyfiles)])
+                binary_descriptor.update([("copy_files-init",
+                                         binary_copyfiles_init)])
+                binary_descriptor.update([("copy_files-default",
+                                         binary_copyfiles_def)])
                 binary_descriptor.update([("chosen", False)])
 
                 self.binaries.update([(binary, binary_descriptor)])
@@ -474,9 +504,31 @@ class Target:
     def get_binaries(self):
         binaries = []
         for binary in self.binaries:
-            binaries.append([(self.binaries[binary])["description"], ""])
+            modified = self.is_copyfiles_modified(binary)
+            custom = self.is_copyfiles_default(binary)
+            binaries.append([(self.binaries[binary])["description"],
+                            ("+" if modified else "") +
+                             ("*" if custom else "")])
 
         return binaries
+
+    def get_binary_srcpath(self, chosen_bin_file):
+        src_path = ""
+        # Search for selected file in chosen binaries set
+        for b in self.binaries:
+            if self.binaries[b]["chosen"]:
+                for outfile in self.binaries[b]["copy_files"]:
+                    if chosen_bin_file == outfile[0]:
+                        if os.path.isabs(outfile[1]):
+                            src_path = outfile[1]
+                        else:
+                            # If default binary used, return current dir
+                            # This is because the path of default binary
+                            # is unknown here as it is passed from build.py
+                            src_path = os.getcwd()
+        if os.path.isdir(src_path) and not src_path.endswith(os.sep):
+            src_path += os.sep
+        return src_path
 
     def get_marked_binaries(self):
         binaries = []
@@ -497,6 +549,27 @@ class Target:
         for binary in self.binaries:
             (self.binaries[binary])["chosen"] = \
                 ((self.binaries[binary])["description"] == bin_desc)
+
+    def set_binaries_copyfile(self, chosen_bin_file, new_bin_file):
+        for b in self.binaries:
+            if self.binaries[b]["chosen"]:
+                for i, f in enumerate(self.binaries[b]["copy_files"]):
+                    if chosen_bin_file == f[0]:
+                        (self.binaries[b]["copy_files"])[i][1] = new_bin_file
+
+    def set_binaries_copyfile_default(self):
+        # reset binaries to default values
+        for b in self.binaries:
+            if self.binaries[b]["chosen"]:
+                self.binaries[b]["copy_files"] = \
+                    copy.deepcopy(self.binaries[b]["copy_files-default"])
+
+    def set_binaries_copyfile_init(self):
+        # drop changes done to copyfiles in current session
+        for b in self.binaries:
+            if self.binaries[b]["chosen"]:
+                self.binaries[b]["copy_files"] = \
+                    copy.deepcopy(self.binaries[b]["copy_files-init"])
 
     def get_fetch_opts(self):
         fetch_opts = []
@@ -646,6 +719,17 @@ class Target:
             (self.targets[target])["build"] = False
         # handle targets disabled by others
         self.handle_disable("build")
+
+    def is_copyfiles_modified(self, binary):
+        # check if copyfiles for selected binaries set
+        # were modified by comparing current and initial
+        return (self.binaries[binary]["copy_files"] !=
+                self.binaries[binary]["copy_files-init"])
+
+    def is_copyfiles_default(self, binary):
+        # check if we use default, unmodified binaries set
+        return (self.binaries[binary]["copy_files"] !=
+                self.binaries[binary]["copy_files-default"])
 
     def do_fetch(self, git_use_depth, git_use_remote):
         if git_use_depth is False:
@@ -984,7 +1068,10 @@ class Target:
             if 'path' not in self.binaries[binary].keys():
                 continue
             for outfile in (self.binaries[binary])["copy_files"]:
-                src = self.binaries[binary]["path"] + "/" + outfile[1]
+                if os.path.isabs(outfile[1]):
+                    src = outfile[1]
+                else:
+                    src = self.binaries[binary]["path"] + "/" + outfile[1]
                 dst = dst_path + "/" + outfile[0]
                 try:
                     shutil.copyfile(src, dst)
@@ -1097,6 +1184,12 @@ class Target:
         for b in self.binaries:
             if self.binaries[b]["chosen"]:
                 binary_lines_a.append(self.binaries[b]["description"])
+                if self.is_copyfiles_default(b):
+                    binary_lines_a.append("Custom binaries used.")
+                    for bf in self.binaries[b]["copy_files"]:
+                        is_def = " (default)" if not os.path.isabs(bf[1]) \
+                                              else ""
+                        binary_lines_a.append(bf[0] + " : " + bf[1]+is_def)
 
         binary_lines = "Binaries:" + line_sep + node_sep.join(binary_lines_a)
 

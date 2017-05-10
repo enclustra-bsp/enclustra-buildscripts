@@ -670,6 +670,9 @@ while done is False:
             continue
 
         code, tags = g.show_binaries_menu(binaries)
+        if code == "extra":
+            t.set_binaries(tags)
+            state = "CUSTOM_FILES_MENU"
         if code == "ok":
             t.set_binaries(tags)
             state = "SHOW_SUMMARY"
@@ -678,6 +681,37 @@ while done is False:
             continue
         elif code in ("cancel", "esc"):
             state = "BUILD_MENU"
+        continue
+
+    elif state == "CUSTOM_FILES_MENU":
+        code, tags = g.show_custom_files_menu(t.binaries)
+        if code == "extra":  # Edit
+            state = "BINARY_PATH_SEL"
+        elif code == "ok":
+            state = "BINARIES_MENU"
+        elif code == "help":  # Default
+            # reset all paths to default
+            t.set_binaries_copyfile_default()
+        elif code in ("cancel", "esc"):  # Reset
+            # drop changes
+            t.set_binaries_copyfile_init()
+        continue
+
+    elif state == "BINARY_PATH_SEL":
+        selected_file = tags
+        initial_path = t.get_binary_srcpath(selected_file)
+        code, path = g.show_custom_binary_sel(selected_file, initial_path)
+        if code == "ok":
+            # check if selected file is valid
+            if os.path.isfile(path):
+                # update copy file in binaries set
+                # and return to custom files menu
+                t.set_binaries_copyfile(selected_file, path)
+                state = "CUSTOM_FILES_MENU"
+            else:
+                code = g.show_warning(path+" is not a valid file.")
+        elif code in ("cancel", "esc"):
+            state = "CUSTOM_FILES_MENU"
         continue
 
     elif state == "SHOW_SUMMARY":

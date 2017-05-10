@@ -162,13 +162,44 @@ class Gui:
 
     def show_binaries_menu(self, menu_items):
         if len(menu_items) != 0:
+            for m in menu_items:
+                m.append("* custom binary set | + modified")
             return self.dialog.menu("Choose the device option.",
                                     choices=menu_items,
+                                    extra_button=True,
+                                    extra_label="Customize",
                                     help_button=True,
                                     help_tags=True,
-                                    cancel_label="Back")
+                                    cancel_label="Back",
+                                    item_help=True,
+                                    )
         else:
             return self.dialog.msgbox("No device options found!")
+
+    def show_custom_files_menu(self, files):
+        menu_options = []
+        for f in files:
+            if files[f]["chosen"]:
+                for outfile in (files[f])["copy_files"]:
+                    if os.path.isabs(outfile[1]):
+                        menu_options.append(outfile)
+                    else:
+                        menu_options.append([outfile[0],
+                                            outfile[1]+" (default path)"])
+        return self.dialog.menu("Setup custom paths for binaries.",
+                                choices=menu_options,
+                                extra_button=True,
+                                extra_label="Edit",
+                                help_button=True,
+                                help_label="Default",
+                                cancel_label="Reset",
+                                width=0)
+
+    def show_custom_binary_sel(self, bin_file, src_path):
+        return self.dialog.fselect(src_path,
+                                   height=10,
+                                   width=60,
+                                   title="Select location for file "+bin_file)
 
     def show_fetch_opts_menu(self, menu_items):
         if len(menu_items) != 0:
@@ -204,6 +235,10 @@ class Gui:
             msg = help_msg
         else:
             msg = "No help message for " + target
+        return self.dialog.msgbox(msg, 15, 60)
+
+    def show_warning(self, msg):
+        msg = "WARNING\n" + msg
         return self.dialog.msgbox(msg, 15, 60)
 
     def show_summary_menu(self, summary, used_previous_config):
