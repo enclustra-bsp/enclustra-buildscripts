@@ -218,13 +218,6 @@ except Exception as ext:
     sys.exit(1)
 
 
-revision = utils.get_git_revision(bscripts_path).rstrip('\n')
-tool_version = tool_name + " (v0.0-" + revision + ")\n"\
-    "Running under Python version "\
-    + str(sys.version.split()[0]) + "."\
-    "\n\nCopyright (c) 2015-2017 Enclustra GmbH, Switzerland." \
-    "\nAll rights reserved."
-
 args = parser.parse_args()
 
 if args.disable_colors is True:
@@ -237,6 +230,13 @@ if args.bs_release:
     sys.argv.remove(args.bs_release)
 else:
     release = 'master'
+
+revision = utils.get_git_revision(bscripts_path).rstrip('\n')
+tool_version = tool_name + " (" + release + "-" + revision + ")\n"\
+    "Running under Python version "\
+    + str(sys.version.split()[0]) + "."\
+    "\n\nCopyright (c) 2015-2017 Enclustra GmbH, Switzerland." \
+    "\nAll rights reserved."
 
 if args.version is True:
     print(str("\n" + tool_version + "\n"))
