@@ -117,7 +117,8 @@ class Gui:
             choice[0] = choice[0].replace("_", " ")
 
         code, tag = self.dialog.menu(description, choices=choices,
-                                     cancel_label="Exit" if exit_label else "Back")
+                                     cancel_label="Exit" if exit_label
+                                     else "Back")
         if code == self.dialog.OK:
             # restore the original key from before underscore substitution
             tag = tagmap[tag]
@@ -180,12 +181,15 @@ class Gui:
         menu_options = []
         for f in files:
             if files[f]["chosen"]:
-                for outfile in (files[f])["copy_files"]:
-                    if os.path.isabs(outfile[1]):
-                        menu_options.append(outfile)
-                    else:
-                        menu_options.append([outfile[0],
-                                            outfile[1]+" (default path)"])
+                try:
+                    for outfile in (files[f])["copy_files"]:
+                        if os.path.isabs(outfile[1]):
+                            menu_options.append(outfile)
+                        else:
+                            menu_options.append([outfile[0],
+                                                outfile[1]+" (default path)"])
+                except TypeError:
+                    return self.dialog.msgbox("No binary files found."), ""
         return self.dialog.menu("Setup custom paths for binaries.",
                                 choices=menu_options,
                                 extra_button=True,
