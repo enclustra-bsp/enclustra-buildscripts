@@ -138,6 +138,16 @@ parser.add_argument("--list-dev-options", action='store_true', required=False,
                     dest='list_dev_options',
                     help='list all available device options for chosen device')
 
+parser.add_argument("--list-dev-binaries", action='store_true', required=False,
+                    dest='list_dev_binaries',
+                    help='list all available binary files for chosen device')
+
+parser.add_argument("-B", "--custom-binary", action='append', nargs=2,
+                    dest='custom_copyfiles', type=str,
+                    metavar=("file", "path"),
+                    help='exchange selected binary file with the one'
+                    ' pointed by the path')
+
 parser.add_argument("--anti-unicorn", action='store_true',
                     required=False, dest='disable_colors',
                     help='disables colored output')
@@ -384,6 +394,14 @@ elif args.device is not None:
             count += 1
         sys.exit(0)
 
+    if args.list_dev_binaries is True:
+        binaries = t.get_marked_binaries()
+        print(str("Available binary files for " + args.device + ":"))
+        for i, binary in enumerate(binaries):
+            print("for set " + str(binary["description"])+":")
+            for cf in binary["copyfiles"]:
+                print("- "+cf[0])
+        sys.exit(0)
     # divide targets into fetch/build groups
     fetch_group = []
     build_group = []
@@ -461,6 +479,19 @@ elif args.device is not None:
     else:
         # set the default one
         t.set_binaries(t.get_default_binary())
+
+    # overwrite chosen binary set to use custom files
+    if args.custom_copyfiles:
+        for cf in args.custom_copyfiles:
+            if os.path.isfile(str(cf[1])):
+                if not t.set_binaries_copyfile(cf[0], cf[1]):
+                    print("Setting binary component "+cf[0]+" failed.\n"
+                          "Use --list-dev-binaries option to list valid"
+                          " components")
+                    sys.exit(1)
+            else:
+                print(cf[1] + " is not a valid path.")
+                sys.exit(1)
 
     state = "DO_FETCH"
 elif args.list_devices is True:

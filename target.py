@@ -534,8 +534,10 @@ class Target:
         binaries = []
         for binary in self.binaries:
             b = dict()
+            b['name'] = binary
             b["description"] = (self.binaries[binary])["description"]
             b["default"] = (self.binaries[binary])["default"]
+            b["copyfiles"] = copy.deepcopy((self.binaries[binary])["copy_files"])
             binaries.append(b)
 
         return binaries
@@ -556,6 +558,8 @@ class Target:
                 for i, f in enumerate(self.binaries[b]["copy_files"]):
                     if chosen_bin_file == f[0]:
                         (self.binaries[b]["copy_files"])[i][1] = new_bin_file
+                        return True
+        return False
 
     def set_binaries_copyfile_default(self):
         # reset binaries to default values
