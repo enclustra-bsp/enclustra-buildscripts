@@ -80,7 +80,8 @@ class Target:
                                 str(self.binaries[b]["chosen"]))
                 # check if copyfiles were modifies
                 # and update config as necessary
-                if self.is_copyfiles_modified(b):
+                if (self.is_copyfiles_modified(b) and
+                        self.config.has_section(b+"-copyfiles")):
                     for i, copyfile in enumerate(self.config[b+"-copyfiles"]):
                         self.config.set(b+"-copyfiles", copyfile,
                                         self.binaries[b]["copy_files"][i][1])
@@ -403,11 +404,16 @@ class Target:
                 else:
                     helpbox = None
 
-                for copyfile in self.config[binary+"-copyfiles"]:
-                    binary_copyfiles.append([copyfile,
-                                             self.config[binary + "-copyfiles"]
-                                             [copyfile]])
-                binary_copyfiles_init = copy.deepcopy(binary_copyfiles)
+                if self.config.has_section(binary+"-copyfiles"):
+                    for copyfile in self.config[binary+"-copyfiles"]:
+                        binary_copyfiles.append([copyfile,
+                                                 self.config[
+                                                    binary + "-copyfiles"]
+                                                 [copyfile]])
+                    binary_copyfiles_init = copy.deepcopy(binary_copyfiles)
+                else:
+                    binary_copyfiles = None
+                    binary_copyfiles_init = None
 
                 if self.config.has_section(binary+"-copyfiles-default"):
                     for copyf_def in self.config[binary+"-copyfiles-default"]:
@@ -420,11 +426,13 @@ class Target:
                     # set current copyfiles to be default
                     # and update config section
                     binary_copyfiles_def = copy.deepcopy(binary_copyfiles)
-                    self.config.add_section(binary+"-copyfiles-default")
-                    for copyfile in self.config[binary+"-copyfiles"]:
-                        self.config.set(binary+"-copyfiles-default", copyfile,
-                                        self.config[binary + "-copyfiles"]
-                                        [copyfile])
+                    if binary_copyfiles is not None:
+                        self.config.add_section(binary+"-copyfiles-default")
+                        for copyfile in self.config[binary+"-copyfiles"]:
+                            self.config.set(binary+"-copyfiles-default",
+                                            copyfile,
+                                            self.config[binary + "-copyfiles"]
+                                            [copyfile])
 
                 binary_descriptor.update([("default", is_default)])
                 binary_descriptor.update([("description", description)])
@@ -537,7 +545,8 @@ class Target:
             b['name'] = binary
             b["description"] = (self.binaries[binary])["description"]
             b["default"] = (self.binaries[binary])["default"]
-            b["copyfiles"] = copy.deepcopy((self.binaries[binary])["copy_files"])
+            b["copyfiles"] = copy.deepcopy(
+                                (self.binaries[binary])["copy_files"])
             binaries.append(b)
 
         return binaries
@@ -1071,22 +1080,27 @@ class Target:
         for binary in self.binaries:
             if 'path' not in self.binaries[binary].keys():
                 continue
-            for outfile in (self.binaries[binary])["copy_files"]:
-                if os.path.isabs(outfile[1]):
-                    src = outfile[1]
-                else:
-                    src = self.binaries[binary]["path"] + "/" + outfile[1]
-                dst = dst_path + "/" + outfile[0]
-                try:
-                    shutil.copyfile(src, dst)
-                    self.utils.print_message(self.utils.logtype.INFO,
-                                             "Copying ./" +
-                                             os.path.relpath(src) +
-                                             " to ./" + os.path.relpath(dst))
-                except Exception as exc:
-                    self.utils.print_message(self.utils.logtype.WARNING,
-                                             "Error while copying file",
-                                             src, ":", str(exc))
+            if (self.binaries[binary])["copy_files"] is not None:
+                for outfile in (self.binaries[binary])["copy_files"]:
+                    if os.path.isabs(outfile[1]):
+                        src = outfile[1]
+                    else:
+                        src = self.binaries[binary]["path"] + "/" + outfile[1]
+                    dst = dst_path + "/" + outfile[0]
+                    try:
+                        shutil.copyfile(src, dst)
+                        self.utils.print_message(self.utils.logtype.INFO,
+                                                 "Copying ./" +
+                                                 os.path.relpath(src) +
+                                                 " to ./" +
+                                                 os.path.relpath(dst))
+                    except Exception as exc:
+                        self.utils.print_message(self.utils.logtype.WARNING,
+                                                 "Error while copying file",
+                                                 src, ":", str(exc))
+            else:
+                self.utils.print_message(self.utils.logtype.WARNING,
+                                         "No binary files to copy found")
 
     def do_generate_image(self, directory, toolchains_paths):
         bootimages = self.get_bootimages()
