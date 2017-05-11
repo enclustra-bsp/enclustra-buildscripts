@@ -115,18 +115,26 @@ class Utils:
                 sys.exit(1)
 
     def call_tool(self, call):
+        returncode = 1
         if self.debug is True:
             self.print_message(self.logtype.HEADER, call)
-        proc = subprocess.Popen(shlex.split(call), stdout=subprocess.PIPE,
-                                stderr=subprocess.STDOUT)
-        for line in proc.stdout:
-            if self.quiet_mode is False:
-                sys.stdout.write(line)
-            if self.log_file is not None:
-                self.log_file.write(line)
-                self.log_file.flush()
-        proc.wait()
-        return proc.returncode
+        try:
+            proc = subprocess.Popen(shlex.split(call), stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT)
+            for line in proc.stdout:
+                if self.quiet_mode is False:
+                    sys.stdout.write(line)
+                if self.log_file is not None:
+                    self.log_file.write(line)
+                    self.log_file.flush()
+            proc.wait()
+            returncode = proc.returncode
+        except Exception as ext:
+            self.print_message(self.logtype.ERROR,
+                               "Error while executing command '"+call+"':",
+                               str(ext.strerror))
+
+        return returncode
 
     def get_git_revision(self, root_path):
         call = "git rev-parse --short HEAD"
