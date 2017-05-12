@@ -744,6 +744,17 @@ class Target:
         return (self.binaries[binary]["copy_files"] !=
                 self.binaries[binary]["copy_files-default"])
 
+    def is_copyfiles_all_custom(self, binary):
+        # check if all binary files in binary set are custom
+        all_custom = True
+        try:
+            for cf in self.binaries[binary]["copy_files"]:
+                if not os.path.isabs(cf[1]):
+                    all_custom = False
+        except TypeError:
+            all_custom = False
+        return all_custom
+
     def do_fetch(self, git_use_depth, git_use_remote):
         if git_use_depth is False:
             self.utils.print_message(self.utils.logtype.WARNING,
@@ -965,6 +976,9 @@ class Target:
         for binary in self.binaries:
             if (self.binaries[binary])["chosen"] is False:
                 continue
+            if (self.is_copyfiles_all_custom(binary)):
+                # all binary files are custom - we can skip
+                continue
             self.utils.print_message(self.utils.logtype.INFO, "Getting binary",
                                      binary)
             # create folder
@@ -1078,7 +1092,13 @@ class Target:
                                      "Copying binaries")
         # copy binaries
         for binary in self.binaries:
-            if 'path' not in self.binaries[binary].keys():
+            # copy files only for chosen binary set
+            if not self.binaries[binary]['chosen']:
+                continue
+            # path is set only when download was successfull
+            # so skip copying if it's unset
+            if ('path' not in self.binaries[binary].keys() and
+                    not self.is_copyfiles_all_custom(binary)):
                 continue
             if (self.binaries[binary])["copy_files"] is not None:
                 for outfile in (self.binaries[binary])["copy_files"]:
