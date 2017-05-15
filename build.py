@@ -41,6 +41,7 @@ try:
     from stat import S_ISREG, ST_MTIME, ST_MODE
 
     import target
+    import glob
     import gui
 
 except ImportError as e:
@@ -589,7 +590,8 @@ while done is False:
     if state == "HISTORY_MENU":
         cfg = []
         dirpath = history_path
-        entries = (os.path.join(dirpath, fn) for fn in os.listdir(dirpath))
+        entries = (os.path.join(dirpath, fn) for fn in
+                   glob.glob(dirpath+"*.ini"))
         entries = ((os.stat(path), path) for path in entries)
         entries = ((stat[ST_MTIME], path)
                    for stat, path in entries if S_ISREG(stat[ST_MODE]))
