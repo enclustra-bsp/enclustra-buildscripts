@@ -275,7 +275,7 @@ elif args.saved_config is not None:
     t = target.Target(root_path, master_repo_path, "",
                       args.saved_config, "No name",
                       debug_calls, utils, history_path,
-                      release)
+                      release, True)
 
     # binaries have to be set by hand
     if t.config.has_section("binaries") is True:
@@ -312,7 +312,7 @@ elif args.build_project is not None:
                       project_file, "No name",
                       debug_calls, utils,
                       os.path.dirname(project_file),
-                      release)
+                      release, True)
 
     # set the project name
     t.target_name = t.config["project"]["name"]
@@ -356,7 +356,7 @@ elif args.device is not None:
     device_name = (str(args.device)).replace("/", "_").replace(" ", "_")
     t = target.Target(root_path, master_repo_path, dev_path, ini_files,
                       device_name, debug_calls, utils, history_path,
-                      release)
+                      release, False)
     # if list only
     if args.list_targets is True:
         targets_list = t.get_fetch()
@@ -612,7 +612,7 @@ while done is False:
                 t = target.Target(root_path, master_repo_path, g.get_workdir(),
                                   dirpath + tag + ".ini", "No name",
                                   debug_calls, utils, history_path,
-                                  release)
+                                  release, used_previous_config)
 
                 # binaries have to be set by hand
                 if t.config.has_section("binaries") is True:
@@ -647,7 +647,8 @@ while done is False:
             # initialize target
             t = target.Target(root_path, master_repo_path, g.get_workdir(),
                               g.get_inifiles(), g.get_target_name(),
-                              debug_calls, utils, history_path, release)
+                              debug_calls, utils, history_path, release,
+                              used_previous_config)
 
     elif state == "FETCH_MENU":
         code, tags = g.show_fetch_menu(t.get_fetch())
@@ -670,9 +671,32 @@ while done is False:
             continue
 
     elif state == "BUILD_MENU":
-        code, tags = g.show_build_menu(t.get_build())
+        # prepare options for configs
+        config_opts = t.get_build_opts("defconfig")
+        for opt in config_opts:
+            # modify option name
+            target_name = opt[0].split(" ")[0]
+            opt[0] = "Load initial " + target_name + " configuration"
+            opt.append("Perform configuration step for " +
+                       target_name + " target")
+
+        code, tags = g.show_build_menu(t.get_build()+config_opts)
         if code == "ok":
+            opt_tags = []
+            # extract configuration tags
+            for tag in list(tags):
+                if "configuration" in tag:
+                    opt_tags.append(tag.split(" ")[2]+" defconfig")
+                    tags.remove(tag)
             t.set_build(tags)
+            t.set_build_opts(opt_tags, "defconfig")
+            # check configuration overwriting
+            overwrite_string = t.get_config_overwrite(tags)
+            if overwrite_string:
+                g.dialog.msgbox("Attention! Your current configuration for " +
+                                overwrite_string + " will be overwritten.",
+                                15, 60)
+
             if project_file is not None:
                 state = "DO_GET_TOOLCHAIN"
             elif not t.fetch_only_run():
@@ -682,12 +706,6 @@ while done is False:
         elif code == "help":
             g.show_help(tags, t.get_target_helpbox(tags))
             continue
-        elif code == "extra":
-            t.set_build(tags)
-            code, subtags = g.show_build_opts_menu(t.get_build_opts())
-            if code == "ok":
-                t.set_build_opts(subtags)
-                continue
         elif code in ("cancel", "esc"):
             if project_file is not None:
                 subprocess.call("clear")

@@ -225,8 +225,6 @@ class Gui:
         if len(menu_items) != 0:
             return self.dialog.checklist("Which targets do you want to build?",
                                          choices=menu_items,
-                                         extra_button=True,
-                                         extra_label="Advanced",
                                          item_help=True,
                                          help_button=True,
                                          help_tags=True,

@@ -22,9 +22,11 @@ import copy
 
 class Target:
     def __init__(self, root_path, master_repo_path, config_path, ini_files,
-                 target_name, debug_calls, utils, history_path, release):
+                 target_name, debug_calls, utils, history_path, release,
+                 used_previous_config):
         self.config = configparser.ConfigParser()
         self.config.optionxform = str
+        self.used_previous_config = used_previous_config
         self.root_path = root_path
         self.master_repo_path = master_repo_path
         self.config_path = config_path
@@ -280,6 +282,14 @@ class Target:
                     target_helpbox = self.config[target + "-help"]["box"]
 
             key = target + "-options"
+
+            # check if target is configured
+            # this is needed in next step
+            target_configured = os.path.isfile(
+                                    os.path.join(self.master_repo_path,
+                                                 target_repository,
+                                                 ".config"))
+
             if self.config.has_section(target + "-build") is True:
                 for command in self.config[target + "-build"]:
                     subtarget = dict()
@@ -287,20 +297,12 @@ class Target:
                     subtarget['cmd'] = self.config[str(target) +
                                                    "-build"][command]
 
-                    skey = "build_steps"
-
-                    subtarget['enabled'] = False
-
-                    if self.config.has_section(key) is False:
-                        subtarget['enabled'] = True
-                        target_build_commands.append(subtarget)
-                        continue
-                    if self.config.has_option(key, skey) is False:
-                        subtarget['enabled'] = True
-                        target_build_commands.append(subtarget)
-                        continue
-
-                    subtarget['enabled'] = command in self.config[key][skey]
+                    subtarget['enabled'] = True
+                    # do not run defconfig when using saved config
+                    # and the target is already configured
+                    if ("defconfig" in command and
+                            self.used_previous_config and target_configured):
+                        subtarget['enabled'] = False
 
                     target_build_commands.append(subtarget)
 
@@ -310,21 +312,12 @@ class Target:
                     subtarget['name'] = target + " " + command
                     subtarget['cmd'] = self.config[str(target) +
                                                    "-parallelbuild"][command]
-
-                    skey = "parallelbuild_steps"
-
-                    subtarget['enabled'] = False
-
-                    if self.config.has_section(key) is False:
-                        subtarget['enabled'] = True
-                        target_parallelbuild_commands.append(subtarget)
-                        continue
-                    if self.config.has_option(key, skey) is False:
-                        subtarget['enabled'] = True
-                        target_parallelbuild_commands.append(subtarget)
-                        continue
-
-                    subtarget['enabled'] = command in self.config[key][skey]
+                    subtarget['enabled'] = True
+                    # do not run defconfig when using saved config
+                    # and the target is already configured
+                    if ("defconfig" in command and
+                            self.used_previous_config and target_configured):
+                        subtarget['enabled'] = False
 
                     target_parallelbuild_commands.append(subtarget)
 
@@ -498,7 +491,10 @@ class Target:
                 os.environ["PATH"] = orig_path
 
     def get_target_helpbox(self, target):
-        return self.targets[target]["helpbox"]
+        try:
+            return self.targets[target]["helpbox"]
+        except KeyError:
+            return "No help available for " + target
 
     def get_binary_helpbox(self, binary):
         for b in self.binaries:
@@ -597,16 +593,16 @@ class Target:
         for target in self.targets:
             (self.targets[target])["history"] = target in fetch_opts
 
-    def get_build_opts(self):
+    def get_build_opts(self, option="all"):
         build_opts = []
 
         for target in self.targets:
-            if (self.targets[target])["build"] is False:
-                continue
             for subt in (self.targets[target])["parallelbuild_commands"]:
-                build_opts.append([subt['name'], "", subt['enabled']])
+                if option == "all" or option in subt['name']:
+                    build_opts.append([subt['name'], "", subt['enabled']])
             for subt in (self.targets[target])["build_commands"]:
-                build_opts.append([subt['name'], "", subt['enabled']])
+                if option == "all" or option in subt['name']:
+                    build_opts.append([subt['name'], "", subt['enabled']])
         return build_opts
 
     def get_subtargets(self, target):
@@ -618,6 +614,30 @@ class Target:
             for subt in (self.targets[target])["build_commands"]:
                 build_opts.append(subt['name'])
         return build_opts
+
+    def get_config_overwrite(self, targets):
+        overwrite_string = ""
+        try:
+            if self.used_previous_config:
+                for t in targets:
+                    if(self.is_target_configured(t) and
+                            self.is_build_opt_set(t, t+" defconfig")):
+                        if overwrite_string == "":
+                            overwrite_string = t
+                        else:
+                            overwrite_string += " and " + t
+        except Exception as e:
+            pass
+        return overwrite_string
+
+    def is_build_opt_set(self, target, opt):
+        for c in (self.targets[target])["parallelbuild_commands"]:
+            if c['name'] == opt:
+                return c['enabled']
+        for c in (self.targets[target])["build_commands"]:
+            if c['name'] == opt:
+                return c['enabled']
+        return False
 
     def validate_subtargets(self, subtargets):
         invalid = []
@@ -631,14 +651,14 @@ class Target:
                     invalid.remove(c['name'])
         return invalid
 
-    def set_build_opts(self, build_opts):
+    def set_build_opts(self, build_opts, option="all"):
         for target in self.targets:
-            if (self.targets[target])["build"] is False:
-                continue
             for c in (self.targets[target])["parallelbuild_commands"]:
-                c['enabled'] = c['name'] in build_opts
+                if option == "all" or option in c['name']:
+                    c['enabled'] = c['name'] in build_opts
             for c in (self.targets[target])["build_commands"]:
-                c['enabled'] = c['name'] in build_opts
+                if option == "all" or option in c['name']:
+                    c['enabled'] = c['name'] in build_opts
 
     def get_fetch(self):
         fetch = []
@@ -754,6 +774,11 @@ class Target:
         except TypeError:
             all_custom = False
         return all_custom
+
+    def is_target_configured(self, target):
+        return os.path.isfile(os.path.join(self.master_repo_path,
+                              self.targets[target]["repository"],
+                              ".config"))
 
     def do_fetch(self, git_use_depth, git_use_remote):
         if git_use_depth is False:
