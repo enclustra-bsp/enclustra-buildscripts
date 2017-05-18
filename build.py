@@ -572,6 +572,7 @@ utils.print_message(utils.logtype.INFO, welcome_msg + "\n\n")
 
 # Main loop
 g = None
+binary_path = ""
 while done is False:
     used_previous_config = False
     if state == "INIT":
@@ -721,12 +722,9 @@ while done is False:
             continue
 
         code, tags = g.show_binaries_menu(binaries)
-        if code == "extra":
-            t.set_binaries(tags)
-            state = "CUSTOM_FILES_MENU"
         if code == "ok":
             t.set_binaries(tags)
-            state = "SHOW_SUMMARY"
+            state = "CUSTOM_FILES_MENU"
         elif code == "help":
             g.show_help(tags, t.get_binary_helpbox(tags))
             continue
@@ -739,29 +737,32 @@ while done is False:
         if code == "extra":  # Edit
             state = "BINARY_PATH_SEL"
         elif code == "ok":
-            state = "BINARIES_MENU"
+            state = "SHOW_SUMMARY"
         elif code == "help":  # Default
             # reset all paths to default
-            t.set_binaries_copyfile_default()
-        elif code in ("cancel", "esc"):  # Reset
-            # drop changes
-            t.set_binaries_copyfile_init()
+            t.set_binaries_copyfile_default(tags)
+        elif code in ("esc", "cancel"):  # Back
+            state = "BINARIES_MENU"
         continue
 
     elif state == "BINARY_PATH_SEL":
         selected_file = tags
-        initial_path = t.get_binary_srcpath(selected_file)
-        code, path = g.show_custom_binary_sel(selected_file, initial_path)
+        initial_path = binary_path if binary_path else \
+            t.get_binary_srcpath(selected_file)
+        code, binary_path = g.show_custom_binary_sel(selected_file,
+                                                     initial_path)
         if code == "ok":
             # check if selected file is valid
-            if os.path.isfile(path):
+            if os.path.isfile(binary_path):
                 # update copy file in binaries set
                 # and return to custom files menu
-                t.set_binaries_copyfile(selected_file, path)
+                t.set_binaries_copyfile(selected_file, binary_path)
+                binary_path = ""
                 state = "CUSTOM_FILES_MENU"
             else:
-                code = g.show_warning(path+" is not a valid file.")
+                code = g.show_warning(binary_path+" is not a valid file.")
         elif code in ("cancel", "esc"):
+            binary_path = ""
             state = "CUSTOM_FILES_MENU"
         continue
 
@@ -776,7 +777,7 @@ while done is False:
             if used_previous_config is True:
                 state = "FETCH_MENU"
             elif not t.fetch_only_run():
-                state = "BINARIES_MENU"
+                state = "CUSTOM_FILES_MENU"
             else:
                 state = "BUILD_MENU"
         continue

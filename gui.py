@@ -164,11 +164,9 @@ class Gui:
     def show_binaries_menu(self, menu_items):
         if len(menu_items) != 0:
             for m in menu_items:
-                m.append("* custom binary set | + modified")
+                m.append("Use selected binaries set.")
             return self.dialog.menu("Choose the device option.",
                                     choices=menu_items,
-                                    extra_button=True,
-                                    extra_label="Customize",
                                     help_button=True,
                                     help_tags=True,
                                     cancel_label="Back",
@@ -190,13 +188,13 @@ class Gui:
                                                 outfile[1]+" (default path)"])
                 except TypeError:
                     return self.dialog.msgbox("No binary files found."), ""
-        return self.dialog.menu("Setup custom paths for binaries.",
+        return self.dialog.menu("Setup paths for custom binaries.",
                                 choices=menu_options,
                                 extra_button=True,
                                 extra_label="Edit",
                                 help_button=True,
                                 help_label="Default",
-                                cancel_label="Reset",
+                                cancel_label="Back",
                                 width=0)
 
     def show_custom_binary_sel(self, bin_file, src_path):

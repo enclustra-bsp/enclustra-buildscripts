@@ -508,11 +508,9 @@ class Target:
     def get_binaries(self):
         binaries = []
         for binary in self.binaries:
-            modified = self.is_copyfiles_modified(binary)
             custom = self.is_copyfiles_default(binary)
             binaries.append([(self.binaries[binary])["description"],
-                            ("+" if modified else "") +
-                             ("*" if custom else "")])
+                             "(custom)" if custom else "(default)"])
 
         return binaries
 
@@ -566,12 +564,21 @@ class Target:
                         return True
         return False
 
-    def set_binaries_copyfile_default(self):
+    def set_binaries_copyfile_default(self, copyfile=None):
         # reset binaries to default values
         for b in self.binaries:
             if self.binaries[b]["chosen"]:
-                self.binaries[b]["copy_files"] = \
-                    copy.deepcopy(self.binaries[b]["copy_files-default"])
+                if copyfile is not None:
+                    # search for copyfile and set it to default
+                    for i, cf in enumerate(self.binaries[b]["copy_files"]):
+                        if cf[0] == copyfile:
+                            cf[1] = \
+                                self.binaries[b]["copy_files-default"][i][1]
+                            break
+                else:
+                    # set all copyfiles to default
+                    self.binaries[b]["copy_files"] = \
+                        copy.deepcopy(self.binaries[b]["copy_files-default"])
 
     def set_binaries_copyfile_init(self):
         # drop changes done to copyfiles in current session
