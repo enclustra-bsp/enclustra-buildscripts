@@ -191,7 +191,6 @@ if config.read(root_path + "/enclustra.ini") is None:
     utils.print_message(utils.logtype.ERROR, "Configuration file not found!")
     sys.exit(1)
 try:
-    manifest_repo = config['general']['manifest_repository']
     nthreads = config['general']['nthreads']
     history_path = config['general']['history_path']
     debug_calls = config.getboolean('debug', 'debug-calls')
@@ -532,37 +531,6 @@ except Exception as ex:
     utils.print_message(utils.logtype.ERROR, "Unable to create 'bin' folder!",
                         ex)
     sys.exit(1)
-
-
-# init master repository
-utils.print_message(utils.logtype.INFO, "Initializing master repository")
-pull = False
-if os.path.isdir(master_repo_path) is True:
-    if os.path.exists(master_repo_path+"/.git") is True:
-        pull = True
-    else:
-        # remove sources dir
-        shutil.rmtree(master_repo_path)
-
-# if pull only
-if pull is True:
-    with utils.cd(master_repo_path):
-        call = "git pull"
-        sp = utils.call_tool(call)
-# clone new
-else:
-    call = "git clone " + manifest_repo + " \"" + master_repo_path + "\""
-    sp = utils.call_tool(call)
-if sp != 0:
-    utils.print_message(utils.logtype.WARNING,
-                        "Fetching master repository failed!")
-    # python3 compatibility (raw_input vs input)
-    try:
-        input = raw_input
-    except NameError:
-        pass
-    if input("Continue anyway? (Y/n) ").lower() == 'n':
-        sys.exit(1)
 
 
 # welcome msg
