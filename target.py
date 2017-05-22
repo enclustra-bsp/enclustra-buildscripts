@@ -1050,7 +1050,7 @@ class Target:
                                              "Error while downloading",
                                              binary,
                                              "binary")
-                continue
+                    continue
             # unpack binary (if required)
             if self.binaries[binary]["unpack"] is True:
                 with self.utils.cd(download_path):
