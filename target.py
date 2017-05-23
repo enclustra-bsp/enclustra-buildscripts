@@ -34,6 +34,7 @@ class Target:
         self.toolchains = []
         self.targets = dict()
         self.binaries = dict()
+        self.const_files = []
         self.bootimages = dict()
         self.clean = dict()
         self.release = release
@@ -442,6 +443,12 @@ class Target:
                 binary_descriptor.update([("chosen", False)])
 
                 self.binaries.update([(binary, binary_descriptor)])
+
+        # get non-modifiable binaries
+        if self.config.has_section("binaries-non-modifiable"):
+            for binary in self.config["binaries-non-modifiable"]:
+                if self.config.getboolean("binaries-non-modifiable", binary):
+                    self.const_files.append(binary)
 
         # get bootimage info
         if self.config.has_section("bootimage"):

@@ -175,12 +175,14 @@ class Gui:
         else:
             return self.dialog.msgbox("No device options found!")
 
-    def show_custom_files_menu(self, files):
+    def show_custom_files_menu(self, files, const_files):
         menu_options = []
         for f in files:
             if files[f]["chosen"]:
                 try:
-                    for outfile in (files[f])["copy_files"]:
+                    cfiles = (files[f])["copy_files"]
+                    mfiles = [m for m in cfiles if m[0] not in const_files]
+                    for outfile in mfiles:
                         if os.path.isabs(outfile[1]):
                             menu_options.append(outfile)
                         else:

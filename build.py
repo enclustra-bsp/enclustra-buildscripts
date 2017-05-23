@@ -700,7 +700,7 @@ while done is False:
         continue
 
     elif state == "CUSTOM_FILES_MENU":
-        code, tags = g.show_custom_files_menu(t.binaries)
+        code, tags = g.show_custom_files_menu(t.binaries, t.const_files)
         if code == "extra":  # Edit
             state = "BINARY_PATH_SEL"
         elif code == "ok":
