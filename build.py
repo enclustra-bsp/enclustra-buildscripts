@@ -34,7 +34,6 @@ try:
     import os
     import configparser
     import subprocess
-    import shutil
     import argparse
     import time
     import re
