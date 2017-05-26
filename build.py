@@ -245,7 +245,8 @@ elif args.clean_all is True:
     utils.print_message(utils.logtype.INFO, "Cleaning ...")
     utils.remove_folder(root_path + "/bin")
     utils.remove_folder(root_path + "/binaries")
-    utils.remove_folder(root_path + "/sources")
+    call = "git submodule deinit --force sources"
+    utils.call_tool(call)
     # get all the output dirs
     dirs = [name for name in os.listdir(root_path) if
             os.path.isdir(os.path.join(root_path, name))]
