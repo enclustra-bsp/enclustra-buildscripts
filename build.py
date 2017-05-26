@@ -662,10 +662,13 @@ while done is False:
             # check configuration overwriting
             overwrite_string = t.get_config_overwrite(tags)
             if overwrite_string:
-                g.dialog.msgbox("Attention! Your current configuration for " +
-                                overwrite_string + " will be overwritten.",
-                                15, 60)
-
+                code = g.dialog.yesno("Attention! Your current configuration \
+                                for " + overwrite_string +
+                                      " will be overwritten.",
+                                      15, 60, yes_label="OK",
+                                      no_label="Cancel")
+                if code == "cancel":
+                    continue
             if project_file is not None:
                 state = "DO_GET_TOOLCHAIN"
             elif not t.fetch_only_run():
