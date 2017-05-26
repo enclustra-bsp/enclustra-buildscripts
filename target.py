@@ -611,6 +611,8 @@ class Target:
         build_opts = []
 
         for target in self.targets:
+            if not self.targets[target]["active"]:
+                continue
             for subt in (self.targets[target])["parallelbuild_commands"]:
                 if option == "all" or option in subt['name']:
                     build_opts.append([subt['name'], "", subt['enabled']])
