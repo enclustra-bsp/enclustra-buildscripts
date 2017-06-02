@@ -18,6 +18,8 @@ import stat
 import shutil
 import archive
 import copy
+import tempfile
+from utils import Utils
 
 
 class Target:
@@ -1039,8 +1041,41 @@ class Target:
             elif os.path.isfile(download_path + "/" + binary_file):
                 os.remove(download_path + "/" + binary_file)
             call = call + " " + self.binaries[binary]["uri"]
-            with self.utils.cd(download_path):
+            temp_path = tempfile.mkdtemp()
+
+            with self.utils.cd(temp_path):
                 sp = self.utils.call_tool(call)
+                if sp == 0:
+                    # see if it is downloaded
+                    if os.path.exists(temp_path + "/" + binary_file):
+                        self.utils.print_message(Utils.logtype.INFO,
+                                                 "New version of",
+                                                 binary_file,
+                                                 "downloaded.")
+                        # download sum
+                        call = "curl -O "
+                        call = call + self.binaries[binary]["uri"] + ".hash"
+                        self.utils.call_tool(call)
+                        # check the checksum
+                        call = "sha256sum -c " + binary_file + ".hash"
+                        sp = self.utils.call_tool(call)
+                        if sp != 0:
+                            self.utils.print_message(Utils.logtype.WARNING,
+                                                     "File corrupted")
+                        else:
+                            self.utils.print_message(Utils.logtype.INFO,
+                                                     "Checksum matches")
+                            # everything ok, copy to real destination
+                            shutil.copy(temp_path + "/" + binary_file,
+                                        download_path + "/")
+                    else:
+                        self.utils.print_message(Utils.logtype.INFO,
+                                                 "No new version of",
+                                                 binary_file,
+                                                 "available")
+
+            shutil.rmtree(temp_path)
+
             if sp != 0:
                 # We could not download file, check if an older version exist
                 can_use_older = True
@@ -1051,7 +1086,7 @@ class Target:
 
                 if can_use_older:
                     self.utils.print_message(self.utils.logtype.WARNING,
-                                             "Could not check for an updated",
+                                             "Could not download an updated",
                                              binary,
                                              "binary, using an older version")
                 else:
