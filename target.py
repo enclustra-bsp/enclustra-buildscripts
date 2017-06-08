@@ -1215,6 +1215,9 @@ class Target:
             with self.utils.cd(directory):
                 for f in bootimages[k]['files']:
                     if not os.path.isfile(f):
+                        info_msg = "Skipping generation of bootimage:"
+                        self.utils.print_message(self.utils.logtype.INFO,
+                                                 info_msg, k)
                         generate_img = False
                         break
 
