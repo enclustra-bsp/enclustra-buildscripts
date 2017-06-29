@@ -116,7 +116,7 @@ class Gui:
             tagmap[choice[0].replace("_", " ")] = choice[0]
             choice[0] = choice[0].replace("_", " ")
 
-        code, tag = self.dialog.menu(description, choices=choices,
+        code, tag = self.dialog.menu(description, choices=sorted(choices),
                                      cancel_label="Exit" if exit_label
                                      else "Back")
         if code == self.dialog.OK:
