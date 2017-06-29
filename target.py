@@ -19,6 +19,7 @@ import shutil
 import archive
 import copy
 import tempfile
+import subprocess
 from utils import Utils
 
 
@@ -31,8 +32,6 @@ class Target:
         self.used_previous_config = used_previous_config
         self.root_path = root_path
         self.master_repo_path = master_repo_path
-        self.config_path = config_path
-        self.config.read(ini_files)
         self.toolchains = []
         self.targets = dict()
         self.binaries = dict()
@@ -40,11 +39,27 @@ class Target:
         self.bootimages = dict()
         self.clean = dict()
         self.release = release
-        self.parse_init_file()
         self.target_name = str(target_name)
         self.debug_calls = debug_calls
         self.history_path = history_path
         self.utils = utils
+
+        try:
+            self.config_path = config_path
+            self.config.read(ini_files)
+            self.parse_init_file()
+        except configparser.ParsingError as e:
+            subprocess.call("clear")
+            err_msg = str(e).replace("\n", " ")
+            utils.print_message(utils.logtype.ERROR, err_msg)
+            # This is a serious error, exit even if exit on error is not set
+            sys.exit(1)
+        except KeyError as e:
+            subprocess.call("clear")
+            err_msg = "One of the section is missing a {} key!".format(str(e))
+            utils.print_message(utils.logtype.ERROR, err_msg)
+            # This is a serious error, exit even if exit on error is not set
+            sys.exit(1)
 
     def save_config(self, filename):
         for t in self.targets:
