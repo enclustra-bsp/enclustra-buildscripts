@@ -441,10 +441,7 @@ elif args.device is not None:
         clean_tar = list(set(clean_tar))
         if not clean_tar:
             clean_tar = t.targets.keys()
-        t.clean_targets(clean_tar,
-                        utils.acquire_toolchains(t.get_required_toolchains(),
-                                                 registered_toolchains,
-                                                 root_path, debug_calls))
+        t.clean_targets(clean_tar)
         sys.exit(0)
 
     if fetch_group or build_group:

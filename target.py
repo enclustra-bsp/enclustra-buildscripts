@@ -471,7 +471,7 @@ class Target:
                 self.bootimages[k]['files'] = files
                 self.bootimages[k]['result_files'] = result_files
 
-    def clean_targets(self, targets, toolchains):
+    def clean_targets(self, targets):
         for t in targets:
             if t not in self.clean:
                 self.utils.print_message(self.utils.logtype.WARNING,
@@ -485,19 +485,8 @@ class Target:
 
             with self.utils.cd((self.master_repo_path + "/" +
                                (self.targets[t])["repository"])):
-
-                orig_path = os.environ["PATH"]
-                toolchain_path = ""
-                for path in toolchains:
-                    toolchain_path += str(path) + ":"
-
-                os.environ["PATH"] = toolchain_path + orig_path
-
                 # build parallel targets
                 self.utils.call_tool(self.clean[t])
-
-                # restore original PATH
-                os.environ["PATH"] = orig_path
 
     def get_target_helpbox(self, target):
         try:
