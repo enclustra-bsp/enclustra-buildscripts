@@ -297,7 +297,6 @@ class Utils:
         self.sigint_orig_handler = signal.getsignal(signal.SIGINT)
 
         def signal_handler(signal, frame):
-            # subprocess.call("clear")
             self.print_message(self.logtype.INFO,
                                "Received SIGINT - aborting.")
             sys.exit(0)
