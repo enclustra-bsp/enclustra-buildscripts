@@ -907,3 +907,7 @@ if done:
 
 if build_log_file is not None:
     build_log_file.close()
+
+# non-zero exit code in case of errors
+if utils.get_error_count():
+    sys.exit(1)
