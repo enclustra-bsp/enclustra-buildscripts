@@ -230,6 +230,9 @@ if args.bs_release:
 else:
     release = 'master'
 
+# add release to tool templates
+utils.add_tool_template("ebe_release", release)
+
 revision = utils.get_git_revision(bscripts_path).rstrip('\n')
 tool_version = tool_name + " (" + release + "-" + revision + ")\n"\
     "Running under Python version "\
