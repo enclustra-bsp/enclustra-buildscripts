@@ -283,6 +283,10 @@ class Target:
             target_build = False
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
+            try:
+                target_priority = int(self.config[target]['priority'])
+            except:
+                target_priority = 50
 
             if self.config.has_option(target, "branch") is True:
                 target_branch = self.config[target]["branch"]
@@ -375,6 +379,7 @@ class Target:
             target_descriptor.update([("disable_build", False)])
             target_descriptor.update([("build_error", False)])
             target_descriptor.update([("repository", target_repository)])
+            target_descriptor.update([("priority", target_priority)])
             target_descriptor.update([("branch", target_branch)])
             target_descriptor.update([("patches", target_patches)])
             target_descriptor.update([("build_commands",
@@ -810,7 +815,8 @@ class Target:
                                      " repositories will be fetched with a"
                                      " history - this may take a long time."
                                      "Consider upgrading your git version.")
-        for target in self.targets:
+        for target in sorted(self.targets,
+                             key=lambda t: self.targets[t]["priority"]):
             if (self.targets[target])["fetch"] is False:
                 continue
             if (self.targets[target])["disable_fetch"] is True:
@@ -947,7 +953,8 @@ class Target:
         return 0
 
     def do_build(self, toolchains_paths, nthreads):
-        for target in self.targets:
+        for target in sorted(self.targets,
+                             key=lambda t: self.targets[t]["priority"]):
             if self.targets[target]["build"] is False:
                 # skip targets unmarked for building
                 self.utils.print_message(self.utils.logtype.INFO,
