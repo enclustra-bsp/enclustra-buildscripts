@@ -190,7 +190,29 @@ if config.read(root_path + "/enclustra.ini") is None:
     utils.print_message(utils.logtype.ERROR, "Configuration file not found!")
     sys.exit(1)
 try:
+    # get number of jobs to use in parallel builds
+    nthreads_default = 9
     nthreads = config['general']['nthreads']
+    # see if we should auto-determine it (use nproc + 1)
+    if nthreads == "auto":
+        try:
+            import multiprocessing
+            nthreads = multiprocessing.cpu_count() + 1
+        except:
+            nthreads = nthreads_default
+            msg = "Couldn't get number of CPUs - using {} jobs"
+            utils.print_message(utils.logtype.WARNING,
+                                msg.format(nthreads))
+    else:
+        try:
+            if int(nthreads) <= 0:
+                raise ValueError
+        except ValueError:
+            nthreads = nthreads_default
+            msg = "Invalid build jobs configuration - using {} jobs"
+            utils.print_message(utils.logtype.WARNING,
+                                msg.format(nthreads))
+
     history_path = config['general']['history_path']
     debug_calls = config.getboolean('debug', 'debug-calls')
     utils.set_debug_calls(debug_calls)
