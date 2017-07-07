@@ -49,7 +49,7 @@ class Utils:
         self.nicecolors = True
         self.warning_count = 0
         self.error_count = 0
-        self.tool_templates = []
+        self.tool_templates = {}
 
     def remove_folder(self, folder):
         try:
@@ -116,12 +116,11 @@ class Utils:
                 sys.exit(1)
 
     def add_tool_template(self, field, value):
-        self.tool_templates.append((field, value))
+        self.tool_templates[field] = value
 
     def call_tool(self, call):
         # fill tool templates
-        for k, v in self.tool_templates:
-            call = call.replace("{" + k + "}", v)
+        call = call.format(**self.tool_templates)
 
         returncode = 1
         if self.debug is True:
