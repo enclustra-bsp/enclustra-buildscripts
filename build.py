@@ -824,6 +824,13 @@ while done is False:
         state = "DO_FETCH"
 
     elif state == "DO_FETCH":
+        # create out dir
+        if def_fname is None:
+            def_fname = t.get_name()
+        t.out_dir = root_path + "/out_" + def_fname
+        t.out_dir = os.path.abspath(t.out_dir)
+        utils.mkdir_p(t.out_dir)
+
         # clear console
         if g:
             subprocess.call("clear")
@@ -869,18 +876,13 @@ while done is False:
         t.do_get_binaries(binaries_path)
 
     elif state == "DO_COPYFILES":
-        if def_fname is None:
-            def_fname = t.get_name()
         utils.print_message(utils.logtype.INFO,
                             "Working directory: " + root_path)
-        out_dir = root_path + "/out_" + def_fname
-        out_dir = os.path.abspath(out_dir)
-        utils.mkdir_p(out_dir)
-        t.do_copyfiles(out_dir)
+        t.do_copyfiles(t.out_dir)
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        out_dir = root_path + "/out_" + def_fname
+        t.out_dir = root_path + "/out_" + def_fname
 
         required_toolchains = t.get_required_toolchains()
         try:
@@ -894,7 +896,7 @@ while done is False:
             done = True
             continue
 
-        t.do_generate_image(out_dir, toolchains)
+        t.do_generate_image(t.out_dir, toolchains)
         if project_mode_save or (project_file is not None):
             state = "GENERATE_PROJECT"
         else:
@@ -902,11 +904,10 @@ while done is False:
 
     elif state == "GENERATE_PROJECT":
         done = True
-        out_dir = root_path + "/out_" + def_fname
 
         # if we are building project, then only update the ini file
         if project_file is not None:
-            t.resave_project(def_fname, out_dir)
+            t.resave_project(def_fname, t.out_dir)
             continue
 
         # elsewise, generate it from scratch
@@ -914,13 +915,13 @@ while done is False:
         for tar in copy_targets:
             src_dir = t.master_repo_path + "/" + \
                       t.targets[tar[0]]["repository"]
-            tar_dir = out_dir + "/" + t.targets[tar[0]]["repository"]
+            tar_dir = t.out_dir + "/" + t.targets[tar[0]]["repository"]
             call = "git clone " + src_dir + " " + tar_dir
             utils.call_tool(call)
             call = "git remote remove origin"
             t.do_custom_cmd(toolchains, tar_dir, call)
 
-        t.save_project(def_fname, out_dir)
+        t.save_project(def_fname, t.out_dir)
 
 if done:
     utils.print_message(utils.logtype.INFO, "-" * 80)
@@ -943,7 +944,7 @@ if done:
 
     if not t.fetch_only_run() and not utils.get_error_count():
         utils.print_message(utils.logtype.INFO, "Output directory: ./" +
-                            os.path.relpath(out_dir))
+                            os.path.relpath(t.out_dir))
 
 if build_log_file is not None:
     build_log_file.close()

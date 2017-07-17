@@ -43,6 +43,7 @@ class Target:
         self.debug_calls = debug_calls
         self.history_path = history_path
         self.utils = utils
+        self.out_dir = None
 
         try:
             self.config_path = config_path
