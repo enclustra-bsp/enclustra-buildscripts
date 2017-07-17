@@ -35,8 +35,6 @@ try:
     import configparser
     import subprocess
     import argparse
-    import atexit
-    import shutil
     import time
     import re
     from stat import S_ISREG, ST_MTIME, ST_MODE
@@ -256,19 +254,6 @@ else:
 
 # add release to tool templates
 utils.add_tool_template("ebe_release", release)
-
-# add ebe overlays to tool templates
-try:
-    from tempfile import mkdtemp
-    ebe_overlays = mkdtemp()
-    utils.add_tool_template("ebe_overlays", ebe_overlays)
-
-    # remember to remove that dir at exit
-    atexit.register(lambda: shutil.rmtree(ebe_overlays))
-except Exception as e:
-    msg = "Unable to create temporary directory for EBE overlays"
-    utils.print_message(utils.logtype.ERROR, msg, str(e))
-    sys.exit(1)
 
 revision = utils.get_git_revision(bscripts_path).rstrip('\n')
 tool_version = tool_name + " (" + release + "-" + revision + ")\n"\
@@ -830,6 +815,15 @@ while done is False:
         t.out_dir = root_path + "/out_" + def_fname
         t.out_dir = os.path.abspath(t.out_dir)
         utils.mkdir_p(t.out_dir)
+
+        # add ebe overlays to tool templates
+        try:
+            ebe_overlays = t.out_dir + "/overlays"
+            utils.add_tool_template("ebe_overlays", ebe_overlays)
+            utils.mkdir_p(ebe_overlays)
+        except Exception as e:
+            msg = "Unable to create a directory for EBE overlays"
+            utils.print_message(utils.logtype.ERROR, msg, str(e))
 
         # clear console
         if g:
