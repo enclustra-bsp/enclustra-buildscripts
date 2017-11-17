@@ -974,6 +974,15 @@ class Target:
 
             with self.utils.cd((self.master_repo_path + "/" +
                                (self.targets[target])["repository"])):
+                # check if the repository is fetched
+                if not os.path.exists(".git"):
+                    msg = "Attempting build of target: " +  target
+                    msg += ", but the repository is not fetched"
+                    self.utils.print_message(self.utils.logtype.ERROR, msg)
+                    (self.targets[target])["build"] = False
+                    (self.targets[target])["build_error"] = True
+                    continue
+
                 # store PATH
                 orig_path = os.environ["PATH"]
                 toolchain_path = ""
