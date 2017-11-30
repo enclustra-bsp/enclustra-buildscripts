@@ -338,6 +338,8 @@ elif args.build_project is not None:
                       os.path.dirname(project_file),
                       release, True)
 
+    t.out_dir = os.path.dirname(project_file)
+
     # set the project name
     t.target_name = t.config["project"]["name"]
 
