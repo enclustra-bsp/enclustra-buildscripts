@@ -212,6 +212,7 @@ class Target:
 
             bfile = open(script_fname, 'w')
             bfile.write("#!/bin/bash\n\n")
+            bfile.write("export EBE_RELEASE={}\n".format(self.release))
             bfile.write("cd ..\n")
             bfile.write("./build.sh --build-project " + project_fname + "\n")
             bfile.close()
