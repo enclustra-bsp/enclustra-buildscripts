@@ -872,7 +872,7 @@ while done is False:
     elif state == "DO_COPYFILES":
         utils.print_message(utils.logtype.INFO,
                             "Working directory: " + root_path)
-        t.do_copyfiles(t.out_dir)
+        t.do_copyfiles()
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":

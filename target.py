@@ -1135,7 +1135,7 @@ class Target:
             # if everything went OK add path to binary descriptor
             self.binaries[binary].update([("path", download_path)])
 
-    def do_copyfiles(self, dst_path):
+    def do_copyfiles(self):
         for target in self.targets:
             # do not copy files for targets that weren't built
             if (self.targets[target])["build"] is True:
@@ -1145,12 +1145,12 @@ class Target:
                     src = self.master_repo_path + "/" +\
                         (self.targets[target])["repository"] +\
                         "/" + outfile[1]
-                    dst = dst_path + "/" + outfile[0]
+                    dst = self.out_dir + "/" + outfile[0]
                     dstdir = "/".join(dst.split("/")[:-1])
 
                     dstdir = os.path.abspath(dstdir)
 
-                    if dstdir.startswith(dst_path) is False:
+                    if dstdir.startswith(self.out_dir) is False:
                         self.utils.print_message(self.utils.logtype.ERROR,
                                                  "Destination file out of ",
                                                  "output directory")
@@ -1174,7 +1174,7 @@ class Target:
             # delete any existing previous products of failed builds
             if (self.targets[target])["build_error"] is True:
                 for outfile in (self.targets[target])["copy_files"]:
-                    file_path = dst_path + "/" + outfile[0]
+                    file_path = self.out_dir + "/" + outfile[0]
                     try:
                         if os.path.isfile(file_path):
                             os.remove(file_path)
@@ -1203,7 +1203,7 @@ class Target:
                         src = outfile[1]
                     else:
                         src = self.binaries[binary]["path"] + "/" + outfile[1]
-                    dst = dst_path + "/" + outfile[0]
+                    dst = self.out_dir + "/" + outfile[0]
                     try:
                         shutil.copyfile(src, dst)
                         self.utils.print_message(self.utils.logtype.INFO,
