@@ -901,7 +901,7 @@ while done is False:
 
         # if we are building project, then only update the ini file
         if project_file is not None:
-            t.resave_project(def_fname, t.out_dir)
+            t.resave_project(project_file)
             continue
 
         # elsewise, generate it from scratch

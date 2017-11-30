@@ -222,7 +222,7 @@ class Target:
             self.utils.print_message(self.utils.logtype.WARNING,
                                      "Failed to save project files.")
 
-    def resave_project(self, filename, fpath):
+    def resave_project(self, project_fname):
         for t in self.targets:
             # only update options
             key = t + "-options"
@@ -251,8 +251,6 @@ class Target:
             self.config.set(key, "parallelbuild_steps", ",".join(subtargets_p))
 
         try:
-            project_fname = fpath + "/" + filename + ".ini"
-
             cfgfile = open(project_fname, 'w')
             self.config.write(cfgfile)
             self.utils.print_message(self.utils.logtype.INFO,
