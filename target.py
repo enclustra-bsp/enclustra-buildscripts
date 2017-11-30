@@ -975,7 +975,7 @@ class Target:
                                (self.targets[target])["repository"])):
                 # check if the repository is fetched
                 if not os.path.exists(".git"):
-                    msg = "Attempting build of target: " +  target
+                    msg = "Attempting build of target: " + target
                     msg += ", but the repository is not fetched"
                     self.utils.print_message(self.utils.logtype.ERROR, msg)
                     (self.targets[target])["build"] = False
