@@ -166,6 +166,10 @@ parser.add_argument("--build-project", action='store', required=False,
                     dest='build_project', metavar='project_file',
                     help='build project')
 
+parser.add_argument("--build-project-auto", action='store', required=False,
+                    dest='build_project_auto', metavar='project_file',
+                    help='build project automatically, skip the gui')
+
 parser.add_argument("-s", "--saved-config", action='store', required=False,
                     dest='saved_config', metavar='cfg',
                     help='use previously saved configuration file')
@@ -331,9 +335,13 @@ elif args.saved_config is not None:
 
     state = "DO_FETCH"
 
-elif args.build_project is not None:
+elif args.build_project is not None or args.build_project_auto is not None:
 
-    project_file = args.build_project
+    if args.build_project is not None:
+        project_file = os.path.abspath(args.build_project)
+    else:
+        project_file = os.path.abspath(args.build_project_auto)
+
     if not os.path.isfile(project_file):
         utils.print_message(utils.logtype.ERROR,
                             "Project file does not exist:",
@@ -359,7 +367,13 @@ elif args.build_project is not None:
     # set the project name
     t.target_name = t.config["project"]["name"]
 
-    state = "INIT"
+    if args.build_project is not None:
+        state = "INIT"
+    else:
+        # build all targets
+        for tgt in t.targets:
+            t.targets[tgt]["build"] = True
+        state = "DO_GET_TOOLCHAIN"
 
 elif args.device is not None:
     # initialize target
