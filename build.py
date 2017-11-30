@@ -262,6 +262,22 @@ tool_version = tool_name + " (" + release + "-" + revision + ")\n"\
     "\n\nCopyright (c) 2015-2017 Enclustra GmbH, Switzerland." \
     "\nAll rights reserved."
 
+
+# define helper functions
+def setup_output_dir(tgt, utl, odir):
+    tgt.out_dir = odir
+    utl.mkdir_p(odir)
+
+    # add ebe overlays to tool templates
+    try:
+        ebe_overlays = odir + "/overlays"
+        utl.add_tool_template("ebe_overlays", ebe_overlays)
+        utl.mkdir_p(ebe_overlays)
+    except Exception as e:
+        msg = "Unable to create a directory for EBE overlays"
+        utl.print_message(utl.logtype.ERROR, msg, str(e))
+
+
 if args.version is True:
     print(str("\n" + tool_version + "\n"))
     sys.exit(0)
@@ -338,7 +354,7 @@ elif args.build_project is not None:
                       os.path.dirname(project_file),
                       release, True)
 
-    t.out_dir = os.path.dirname(project_file)
+    setup_output_dir(t, utils, os.path.dirname(project_file))
 
     # set the project name
     t.target_name = t.config["project"]["name"]
@@ -814,18 +830,8 @@ while done is False:
         # create out dir
         if def_fname is None:
             def_fname = t.get_name()
-        t.out_dir = root_path + "/out_" + def_fname
-        t.out_dir = os.path.abspath(t.out_dir)
-        utils.mkdir_p(t.out_dir)
-
-        # add ebe overlays to tool templates
-        try:
-            ebe_overlays = t.out_dir + "/overlays"
-            utils.add_tool_template("ebe_overlays", ebe_overlays)
-            utils.mkdir_p(ebe_overlays)
-        except Exception as e:
-            msg = "Unable to create a directory for EBE overlays"
-            utils.print_message(utils.logtype.ERROR, msg, str(e))
+        setup_output_dir(t, utils,
+                         os.path.abspath(root_path + "/out_" + def_fname))
 
         # clear console
         if g:
@@ -878,7 +884,7 @@ while done is False:
         state = "DO_IMAGE_GEN"
 
     elif state == "DO_IMAGE_GEN":
-        t.out_dir = root_path + "/out_" + def_fname
+        setup_output_dir(t, utils, root_path + "/out_" + def_fname)
 
         required_toolchains = t.get_required_toolchains()
         try:
