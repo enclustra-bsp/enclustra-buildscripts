@@ -162,6 +162,10 @@ parser.add_argument("-o", "--dev-option", action='store', required=False,
                     help='set device option by index, the default one will'
                     ' be used if not specified')
 
+parser.add_argument("--generate-project", action='store_true', required=False,
+                    dest='generate_project',
+                    help='generate project directory instead of a regular output')
+
 parser.add_argument("--build-project", action='store', required=False,
                     dest='build_project', metavar='project_file',
                     help='build project')
@@ -247,6 +251,9 @@ args = parser.parse_args()
 
 if args.disable_colors is True:
     utils.set_colors(False)
+
+if args.generate_project:
+    project_mode_save = True
 
 # figure out release version
 if args.bs_release:
