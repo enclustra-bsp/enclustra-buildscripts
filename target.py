@@ -877,9 +877,9 @@ class Target:
             # if there is postfetch custom script
             if "postfetch" in self.targets[target]:
                 try:
-                    self.utils.run_post_script("fetch", self.targets[target],
-                                               self.config_path,
-                                               self.master_repo_path)
+                    self.utils.run_script("postfetch", self.targets[target],
+                                          self.config_path,
+                                          self.master_repo_path)
                 except:
                     (self.targets[target])["build"] = False
 
@@ -1004,10 +1004,10 @@ class Target:
                 if "postbuild" in self.targets[target]:
                     # copy script file to just fetched repository
                     try:
-                        self.utils.run_post_script("build",
-                                                   self.targets[target],
-                                                   self.config_path,
-                                                   self.master_repo_path)
+                        self.utils.run_script("postbuild",
+                                              self.targets[target],
+                                              self.config_path,
+                                              self.master_repo_path)
                     except:
                         (self.targets[target])["build"] = False
                         (self.targets[target])["build_error"] = True

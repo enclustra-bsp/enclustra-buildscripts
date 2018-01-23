@@ -152,24 +152,29 @@ class Utils:
                 revision = "unknown"
         return revision
 
-    def run_post_script(self, state, target, boardpath, master_repo_path):
-        script = target["post"+state]
+    def run_script(self, state, target, boardpath, master_repo_path):
+        cmd = target[state]
+        cmd_split = cmd.split()
+        script = cmd_split[0]
+        dst_script = os.path.basename(script)
+        cmd_split[0] = dst_script
+        new_cmd = " ".join(cmd_split)
         src = boardpath + "/" + script
         dst = master_repo_path + "/" + target["repository"]
         try:
-            shutil.copyfile(src, dst+"/"+script)
+            shutil.copyfile(src, dst+"/"+dst_script)
         except:
             self.print_message(self.logtype.ERROR, "Error copying file", src,
                                "to", dst)
             raise IOError
         with self.cd(dst):
             try:
-                call = "bash "+script
+                call = "bash "+new_cmd
                 sp = self.call_tool(call)
             except:
                 sp = -1
             if sp != 0:
-                self.print_message(self.logtype.ERROR, "Post" + state,
+                self.print_message(self.logtype.ERROR, state.capitalize(),
                                    "script", script, "failed")
                 raise IOError
 
