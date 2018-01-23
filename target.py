@@ -982,6 +982,17 @@ class Target:
                     (self.targets[target])["build_error"] = True
                     continue
 
+                if "prebuild" in self.targets[target]:
+                    # copy script file to just fetched repository
+                    try:
+                        self.utils.run_script("prebuild",
+                                              self.targets[target],
+                                              self.config_path,
+                                              self.master_repo_path)
+                    except:
+                        (self.targets[target])["build"] = False
+                        (self.targets[target])["build_error"] = True
+
                 # store PATH
                 orig_path = os.environ["PATH"]
                 toolchain_path = ""
