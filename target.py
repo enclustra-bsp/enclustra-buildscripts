@@ -1239,14 +1239,21 @@ class Target:
                 return
 
             # check if every required file is accessible
+            missing_files = []
             with self.utils.cd(directory):
                 for f in bootimages[k]['files']:
                     if not os.path.isfile(f):
-                        info_msg = "Skipping generation of bootimage:"
-                        self.utils.print_message(self.utils.logtype.INFO,
-                                                 info_msg, k)
-                        generate_img = False
-                        break
+                        missing_files.append(f)
+
+            if len(missing_files):
+                generate_img = False
+                info_msg = "Skipping generation of bootimage:"
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         info_msg, k)
+                info_msg = "The missing files are:"
+                missing_files = ", ".join(missing_files)
+                self.utils.print_message(self.utils.logtype.INFO,
+                                         info_msg, missing_files)
 
             # if dependancies are met
             if generate_img:
