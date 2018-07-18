@@ -36,6 +36,7 @@ try:
     import subprocess
     import argparse
     import time
+    import datetime
     import re
     from stat import S_ISREG, ST_MTIME, ST_MODE
 
@@ -265,12 +266,13 @@ else:
 
 # add release to tool templates
 utils.add_tool_template("ebe_release", release)
-
+now = datetime.datetime.now()
 revision = utils.get_git_revision(bscripts_path).rstrip('\n')
 tool_version = tool_name + " (" + release + "-" + revision + ")\n"\
     "Running under Python version "\
     + str(sys.version.split()[0]) + "."\
-    "\n\nCopyright (c) 2015-2017 Enclustra GmbH, Switzerland." \
+    "\n\nCopyright (c) 2015-" + str(now.year) + \
+    " Enclustra GmbH, Switzerland." \
     "\nAll rights reserved."
 
 
