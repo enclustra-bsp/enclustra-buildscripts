@@ -76,7 +76,8 @@ required_tools = (["make",   "--version", 3, "3.79.1"],
                   ["curl",   "--version", 2, "7.9.3"],
                   ["gcc",    "--version", 3, "4.8.3"],
                   ["g++",    "--version", 3, "4.8.3"],
-                  ["patch",  "--version", 3, "2.7.1"])
+                  ["patch",  "--version", 3, "2.7.1"],
+                  ["rsync",  "--version", 3, "3.1.1"])
 
 # setup sigint handler
 utils.init_sigint_handler()
