@@ -126,8 +126,8 @@ class Utils:
         if self.debug is True:
             self.print_message(self.logtype.HEADER, call)
         try:
-            proc = subprocess.Popen(shlex.split(call), stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT)
+            proc = subprocess.Popen(call, stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, shell=True)
             for line in proc.stdout:
                 if self.quiet_mode is False:
                     sys.stdout.write(line)
