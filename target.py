@@ -74,6 +74,10 @@ class Target:
 
             self.config.set(key, "build", str(self.targets[t]["build"]))
 
+            if "build_order" in self.targets[t]:
+                self.config.set(key, "build_order", str(self.targets[t]
+                                ["build_order"]))
+
             subtargets = []
             subtargets_p = []
             for s in self.targets[t]["parallelbuild_commands"]:
@@ -151,6 +155,10 @@ class Target:
                 self.config.add_section(key)
 
             self.config.set(key, "build", str(False))
+
+            if "build_order" in self.targets[t]:
+                self.config.set(key, "build_order", str(self.targets[t]
+                                ["build_order"]))
 
             subtargets = []
             subtargets_p = []
@@ -1000,15 +1008,67 @@ class Target:
                     toolchain_path += str(path) + ":"
                 os.environ["PATH"] = toolchain_path + orig_path
 
-                # build parallel targets
-                for subt in (self.targets[target])["parallelbuild_commands"]:
-                    if subt['enabled']:
-                        self.call_build_tool(subt['cmd'], target, nthreads)
+                key = target + "-options"
+                if self.config.has_option(key, "build_order"):
+                    # build targets according to defined order
+                    count_subt_parallel = 0
+                    count_subt_build = 0
+                    for subt in self.config.get(key, "build_order").split(","):
+                        sub_option = target + " " + subt
+                        sub_found = False
+                        for partar in (self.targets[target])[
+                                       "parallelbuild_commands"]:
+                            if partar['name'] == sub_option:
+                                # build parallel targets
+                                self.call_build_tool(partar['cmd'],
+                                                     target, nthreads)
+                                sub_found = True
+                                count_subt_parallel += 1
+                                break
 
-                # build targets
-                for subt in (self.targets[target])["build_commands"]:
-                    if subt['enabled']:
-                        self.call_build_tool(subt['cmd'], target, 0)
+                        # All targets from the build order section
+                        # have to be defined either in the build
+                        # or the parallel build section
+                        if sub_found:
+                            continue
+                        for btar in (self.targets[target])["build_commands"]:
+                            if btar['name'] == sub_option:
+                                # build targets
+                                self.call_build_tool(btar['cmd'], target, 0)
+                                sub_found = True
+                                count_subt_build += 1
+                                break
+
+                        if sub_found:
+                            continue
+                        self.utils.print_message(self.utils.logtype.ERROR,
+                                                 "Undefined subtarget",
+                                                 sub_option, "referenced "
+                                                 "in the build order")
+
+                    if count_subt_parallel < len((self.targets[target])[
+                                                  "parallelbuild_commands"]):
+                        self.utils.print_message(self.utils.logtype.WARNING,
+                                                 "Not all ", target,
+                                                 "parallelbuild targets are "
+                                                 "included in the build "
+                                                 "order section")
+                    if count_subt_build < len((self.targets[target])[
+                                               "build_commands"]):
+                        self.utils.print_message(self.utils.logtype.WARNING,
+                                                 "Not all ", target, "build "
+                                                 "targets are included in the "
+                                                 "build_order section")
+                else:
+                    # build parallel targets
+                    for subt in (self.targets[target])[
+                                 "parallelbuild_commands"]:
+                        if subt['enabled']:
+                            self.call_build_tool(subt['cmd'], target, nthreads)
+                    # build targets
+                    for subt in (self.targets[target])["build_commands"]:
+                        if subt['enabled']:
+                            self.call_build_tool(subt['cmd'], target, 0)
 
                 # restore original PATH
                 os.environ["PATH"] = orig_path
