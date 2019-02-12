@@ -197,9 +197,8 @@ class Utils:
         return_paths = []
         for toolchain in required:
             if toolchain in registered:
-                # if toolchain is registered as 'local' return empty string
+                # if toolchain is registered as 'local', continue
                 if registered[toolchain]["remote"] is False:
-                    return_paths.append("")
                     continue
 
                 toolchain_location = registered[toolchain]["server"]
