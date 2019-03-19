@@ -209,7 +209,7 @@ class Utils:
                     if os.path.isfile(os.path.basename(toolchain_location)):
                         if not os.path.isdir(registered[toolchain]["path"]):
                             self.print_message(self.logtype.INFO,
-                                               "Toolchain archive seems to ",
+                                               "Toolchain archive seems to",
                                                "be corrupted, redownloading")
                             os.remove(os.path.basename(toolchain_location))
 
