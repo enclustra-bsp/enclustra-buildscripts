@@ -717,13 +717,13 @@ class Target:
         for target in fetch:
             if target not in self.targets.keys():
                 self.utils.print_message(self.utils.logtype.ERROR,
-                                         "Target does not exist: ",
+                                         "Target does not exist:",
                                          target)
 
                 available_targets = ", ".join(self.targets)
 
                 self.utils.print_message(self.utils.logtype.INFO,
-                                         "Available targets: ",
+                                         "Available targets:",
                                          available_targets)
                 sys.exit(1)
         for target in self.targets:
@@ -760,13 +760,13 @@ class Target:
         for target in build:
             if target not in self.targets.keys():
                 self.utils.print_message(self.utils.logtype.ERROR,
-                                         "Target does not exist: ",
+                                         "Target does not exist:",
                                          target)
 
                 available_targets = ", ".join(self.targets)
 
                 self.utils.print_message(self.utils.logtype.INFO,
-                                         "Available targets: ",
+                                         "Available targets:",
                                          available_targets)
                 sys.exit(1)
         for target in self.targets:
@@ -1049,14 +1049,14 @@ class Target:
                     if count_subt_parallel < len((self.targets[target])[
                                                   "parallelbuild_commands"]):
                         self.utils.print_message(self.utils.logtype.WARNING,
-                                                 "Not all ", target,
+                                                 "Not all", target,
                                                  "parallelbuild targets are "
                                                  "included in the build "
                                                  "order section")
                     if count_subt_build < len((self.targets[target])[
                                                "build_commands"]):
                         self.utils.print_message(self.utils.logtype.WARNING,
-                                                 "Not all ", target, "build "
+                                                 "Not all", target, "build "
                                                  "targets are included in the "
                                                  "build_order section")
                 else:
@@ -1122,7 +1122,7 @@ class Target:
             except:
                 self.utils.print_message(self.utils.logtype.ERROR,
                                          "Failed to create download folder",
-                                         "for ", binary, "binary")
+                                         "for", binary, "binary")
                 continue
             # download binary
             binary_file = os.path.basename(self.binaries[binary]["uri"])
@@ -1222,7 +1222,7 @@ class Target:
 
                     if dstdir.startswith(self.out_dir) is False:
                         self.utils.print_message(self.utils.logtype.ERROR,
-                                                 "Destination file out of ",
+                                                 "Destination file out of",
                                                  "output directory")
                         continue
 
