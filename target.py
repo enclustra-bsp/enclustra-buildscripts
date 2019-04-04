@@ -1126,7 +1126,7 @@ class Target:
                 continue
             # download binary
             binary_file = os.path.basename(self.binaries[binary]["uri"])
-            call = "curl -O "
+            call = "curl -L -O "
             if self.binaries[binary]["redownload"] is False:
                 call = call + "-z " + download_path + "/" + binary_file
             elif os.path.isfile(download_path + "/" + binary_file):
@@ -1144,7 +1144,7 @@ class Target:
                                                  binary_file,
                                                  "downloaded.")
                         # download sum
-                        call = "curl -O "
+                        call = "curl -L -O "
                         call = call + self.binaries[binary]["uri"] + ".hash"
                         self.utils.call_tool(call)
                         # check the checksum
