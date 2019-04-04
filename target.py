@@ -626,17 +626,17 @@ class Target:
         for target in self.targets:
             (self.targets[target])["history"] = target in fetch_opts
 
-    def get_build_opts(self, option="all"):
+    def get_build_opts(self, option):
         build_opts = []
 
         for target in self.targets:
             if not self.targets[target]["active"]:
                 continue
             for subt in (self.targets[target])["parallelbuild_commands"]:
-                if option == "all" or option in subt['name']:
+                if option == subt['name'].split(" ")[1]:
                     build_opts.append([subt['name'], "", subt['enabled']])
             for subt in (self.targets[target])["build_commands"]:
-                if option == "all" or option in subt['name']:
+                if option == subt['name'].split(" ")[1]:
                     build_opts.append([subt['name'], "", subt['enabled']])
         return build_opts
 
