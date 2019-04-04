@@ -215,7 +215,7 @@ class Utils:
 
                     if os.path.isfile(
                             os.path.basename(toolchain_location)) is False:
-                        call = "curl -O " + toolchain_location
+                        call = "curl -L -O " + toolchain_location
                         if self.call_tool(call) != 0:
                             self.print_message(self.logtype.ERROR,
                                                "Error while downloading",
