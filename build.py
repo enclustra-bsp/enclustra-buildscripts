@@ -70,14 +70,21 @@ def_fname = None
 project_file = None
 project_mode_save = False
 
-required_tools = (["make",   "--version", 3, "3.79.1"],
-                  ["git",    "--version", 3, "1.7.8"],
-                  ["tar",    "--version", 4, "1.15"],
-                  ["curl",   "--version", 2, "7.9.3"],
-                  ["gcc",    "--version", 3, "4.8.3"],
-                  ["g++",    "--version", 3, "4.8.3"],
-                  ["patch",  "--version", 3, "2.7.1"],
-                  ["rsync",  "--version", 3, "3.1.0"])
+required_tools = (["make",        "--version", 3, "3.79.1"],
+                  ["git",         "--version", 3, "1.7.8"],
+                  ["tar",         "--version", 4, "1.15"],
+                  ["unzip",       "-v",        2, "6.0"],
+                  ["curl",        "--version", 2, "7.9.3"],
+                  ["wget",        "--version", 3, "1.15"],
+                  ["bc",          "--version", 2, "1.06.95"],
+                  ["gcc",         "--version", 3, "4.8.3"],
+                  ["g++",         "--version", 3, "4.8.3"],
+                  ["patch",       "--version", 3, "2.7.1"],
+                  ["flex",        "--version", 2, "2.5.35"],
+                  ["bison",       "--version", 4, "3.0.2"],
+                  ["cpio",        "--version", 4, "2.11"],
+                  ["autoconf",    "--version", 4, "2.69"],
+                  ["rsync",       "--version", 3, "3.1.0"])
 
 # setup sigint handler
 utils.init_sigint_handler()
