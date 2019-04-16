@@ -291,6 +291,8 @@ class Target:
             target_build = False
             target_active = self.config.getboolean('targets', target)
             target_repository = self.config[target]['repository']
+            target_prefetched = False
+
             try:
                 target_priority = int(self.config[target]['priority'])
             except:
@@ -360,6 +362,9 @@ class Target:
 
                 if self.config.has_option(key, "build"):
                     target_build = self.config.getboolean(key, "build")
+                if self.config.has_option(key, "prefetched"):
+                    target_prefetched = self.config.getboolean(key, "prefetched")
+
 
             if self.config.has_section(target + "-patches") is True:
                 for patch in self.config[target + "-patches"]:
@@ -381,6 +386,7 @@ class Target:
             target_descriptor.update([("disable", target_disable)])
             target_descriptor.update([("fetch", target_fetch)])
             target_descriptor.update([("disable_fetch", False)])
+            target_descriptor.update([("prefetched", target_prefetched)])
             target_descriptor.update([("history", target_fetch_history)])
             target_descriptor.update([("build", target_build)])
             target_descriptor.update([("active", target_active)])
@@ -700,6 +706,8 @@ class Target:
         for target in self.targets:
             if not self.targets[target]["active"]:
                 continue
+            if self.targets[target]["prefetched"]:
+                continue
             help_msg = "Fetch " + self.targets[target]["help"]
             fetch.append([target, "",
                          (self.targets[target])["fetch"],
@@ -829,6 +837,9 @@ class Target:
                 continue
             if (self.targets[target])["disable_fetch"] is True:
                 continue
+            if (self.targets[target])["prefetched"] is True:
+                continue
+
             self.utils.print_message(self.utils.logtype.INFO, "Fetching",
                                      target)
             # If target is set to fetch w/o history or we have old git version

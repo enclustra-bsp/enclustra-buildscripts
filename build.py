@@ -684,7 +684,12 @@ while done is False:
                               used_previous_config)
 
     elif state == "FETCH_MENU":
-        code, tags = g.show_fetch_menu(t.get_fetch())
+        fetch_list = t.get_fetch()
+        if fetch_list:
+            code, tags = g.show_fetch_menu(fetch_list)
+        else:
+            state = "BUILD_MENU"
+
         if code in ("cancel", "esc"):
             state = "TARGET_MENU"
             g.step_out()
