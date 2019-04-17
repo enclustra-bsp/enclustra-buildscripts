@@ -425,7 +425,7 @@ elif args.device is not None:
                       release, False)
     # if list only
     if args.list_targets is True:
-        targets_list = t.get_fetch()
+        targets_list = t.get_build()
         print(str("Available targets for " + args.device + ":"))
         print(str("Default targets are marked with an [*]"))
         for tgt in targets_list:
@@ -439,7 +439,7 @@ elif args.device is not None:
             print(str(tgt[0]))
         sys.exit(0)
     elif args.list_targets_raw is True:
-        targets_list = t.get_fetch()
+        targets_list = t.get_build()
         for tgt in targets_list:
             subs = []
             for st in t.get_subtargets(tgt[0]):
