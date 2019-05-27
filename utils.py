@@ -128,7 +128,7 @@ class Utils:
         try:
             proc = subprocess.Popen(call, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, shell=True)
-            for line in proc.stdout:
+            for line in iter(proc.stdout.readline, ""):
                 if self.quiet_mode is False:
                     sys.stdout.write(line)
                 if self.log_file is not None:
