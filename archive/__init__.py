@@ -34,7 +34,7 @@ class Archive(object):
     def _archive_cls(file, filename=None):
         cls = None
         if not filename:
-            if isinstance(file, basestring):
+            if isinstance(file, str):
                 filename = file
             else:
                 try:
@@ -87,7 +87,7 @@ class BaseArchive(object):
 class TarArchive(BaseArchive):
 
     def __init__(self, file):
-        self._archive = tarfile.open(file) if isinstance(file, basestring) \
+        self._archive = tarfile.open(file) if isinstance(file, str) \
                 else tarfile.open(fileobj=file)
 
     def printdir(self, *args, **kwargs):

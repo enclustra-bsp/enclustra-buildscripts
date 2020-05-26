@@ -127,7 +127,7 @@ class Utils:
             self.print_message(self.logtype.HEADER, call)
         try:
             proc = subprocess.Popen(call, stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT, shell=True)
+                                    stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
             for line in proc.stdout:
                 if self.quiet_mode is False:
                     sys.stdout.write(line)
@@ -147,7 +147,7 @@ class Utils:
         call = "git rev-parse --short HEAD"
         with self.cd(root_path):
             try:
-                revision = subprocess.check_output(shlex.split(call))
+                revision = subprocess.check_output(shlex.split(call), universal_newlines=True)
             except:
                 revision = "unknown"
         return revision
@@ -261,7 +261,7 @@ class Utils:
     def check_tool(self, command, option, version_location, minimal_version):
         try:
             stdoutdata = subprocess.check_output([command, option],
-                                                 stderr=subprocess.PIPE)
+                                                 stderr=subprocess.PIPE, universal_newlines=True)
         except:
             return False
         local = \
