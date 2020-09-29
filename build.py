@@ -203,7 +203,7 @@ parser.add_argument("-v", "--version", action='store_true', required=False,
 
 # process main config
 config = configparser.ConfigParser()
-if config.read(root_path + "/enclustra.ini") is None:
+if len(config.read(root_path + "/enclustra.ini")) == 0:
     utils.print_message(utils.logtype.ERROR, "Configuration file not found!")
     sys.exit(1)
 try:
