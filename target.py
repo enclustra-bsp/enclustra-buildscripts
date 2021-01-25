@@ -1154,21 +1154,8 @@ class Target:
                                                  "New version of",
                                                  binary_file,
                                                  "downloaded.")
-                        # download sum
-                        call = "curl -L -O "
-                        call = call + self.binaries[binary]["uri"] + ".hash"
-                        self.utils.call_tool(call)
-                        # check the checksum
-                        call = "sha256sum -c " + binary_file + ".hash"
-                        sp = self.utils.call_tool(call)
-                        if sp != 0:
-                            self.utils.print_message(Utils.logtype.WARNING,
-                                                     "File corrupted")
-                        else:
-                            self.utils.print_message(Utils.logtype.INFO,
-                                                     "Checksum matches")
-                            # everything ok, copy to real destination
-                            shutil.copy(temp_path + "/" + binary_file,
+                        # everything ok, copy to real destination
+                        shutil.copy(temp_path + "/" + binary_file,
                                         download_path + "/")
                     else:
                         self.utils.print_message(Utils.logtype.INFO,
