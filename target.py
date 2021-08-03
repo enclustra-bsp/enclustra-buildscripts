@@ -1101,7 +1101,8 @@ class Target:
                                        "parallelbuild_commands"]:
                             if partar['name'] == sub_option:
                                 # build parallel targets
-                                self.call_build_tool(partar['cmd'],
+                                if partar['enabled']:
+                                    self.call_build_tool(partar['cmd'],
                                                      target, nthreads)
                                 sub_found = True
                                 count_subt_parallel += 1
@@ -1115,7 +1116,8 @@ class Target:
                         for btar in (self.targets[target])["build_commands"]:
                             if btar['name'] == sub_option:
                                 # build targets
-                                self.call_build_tool(btar['cmd'], target, 0)
+                                if partar['enabled']:
+                                    self.call_build_tool(btar['cmd'], target, 0)
                                 sub_found = True
                                 count_subt_build += 1
                                 break
