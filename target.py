@@ -101,6 +101,8 @@ class Target:
 
         if self.config.has_section("binaries") is True:
             for b in self.config["binaries"]:
+                for a in self.binaries:
+                     self.config.set(a, "chosen", str(self.binaries[a]["chosen"]))
                 self.config.set("binaries", b,
                                 str(self.binaries[b]["chosen"]))
                 # check if copyfiles were modifies
@@ -184,11 +186,12 @@ class Target:
         # cleanup the ini file to the required minimum
         if self.config.has_section("binaries") is True:
             for s in self.config["binaries"]:
-                if self.config.has_section(s):
-                    self.config.remove_section(s)
-                if self.config.has_section(s + "-copyfiles"):
-                    self.config.remove_section(s + "-copyfiles")
+                self.config.set(s, "chosen", str(self.binaries[s]["chosen"]))
+                if self.binaries[s]["chosen"] is True:
+                    selected_binary = s
             self.config.remove_section("binaries")
+            self.config.add_section("binaries")
+            self.config.set("binaries", str(selected_binary), "true")
 
         if self.config.has_section("targets"):
             for t in self.config["targets"]:
@@ -445,6 +448,10 @@ class Target:
                     redownload = False
                 unpack = self.config.getboolean(binary, "unpack")
                 description = self.config[binary]["description"]
+                if self.config.has_option(binary, "chosen"):
+                    chosen = self.config[binary]["chosen"]
+                else:
+                    chosen = False
                 if self.config.has_option(binary, "helpbox"):
                     helpbox = self.config[binary]["helpbox"]
                 else:
@@ -502,7 +509,7 @@ class Target:
                                          binary_copyfiles_init)])
                 binary_descriptor.update([("copy_files-default",
                                          binary_copyfiles_def)])
-                binary_descriptor.update([("chosen", False)])
+                binary_descriptor.update([("chosen", bool(chosen))])
 
                 self.binaries.update([(binary, binary_descriptor)])
 
