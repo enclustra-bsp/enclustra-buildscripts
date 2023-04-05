@@ -1055,11 +1055,11 @@ class Target:
                 dtb.write("/dts-v1/;\n\n")		
                 # include the device tree for the module at the top (module device tree name starts with ME- or MA-)
                 for dt in device_tree:
-                    if "MA-" in dt or "ME-" in dt:
+                    if "MA-" in dt or "ME-" in dt or "AM-" in dt:
                         dtb.write("#include \"" + dt + "\"\n")			
                 # add other device tree below the module device tree
                 for dt in device_tree:
-                    if "MA-" not in dt and "ME-" not in dt:
+                    if "MA-" not in dt and "ME-" not in dt and "AM-" not in dt:
                         dtb.write("#include \"" + dt + "\"\n")
                 dtb.close()
                 self.utils.print_message(self.utils.logtype.OK, target + " device-tree " + dt_path +
