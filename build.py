@@ -894,7 +894,7 @@ while done is False:
         if args.expert_mode is True:
             state = "EXPERT_MODE"
         else:
-            state = "DO_BUILD"
+            state = "HANDLE_BINARIES"
 
     elif state == "EXPERT_MODE":
         utils.create_xpmode_script(root_path)
@@ -902,16 +902,17 @@ while done is False:
                             "To use Expert Mode run '. sources/xpmode_env.sh'")
         sys.exit(0)
 
-    elif state == "DO_BUILD":
-        t.do_build(toolchains_paths, nthreads)
-        state = "HANDLE_BINARIES"
-
     elif state == "HANDLE_BINARIES":
-        state = "DO_COPYFILES"
+        state = "DO_BUILD"
         if t.fetch_only_run():
             continue
         binaries_path = root_path + "/binaries"
         t.do_get_binaries(binaries_path)
+        t.do_copybinaries()
+
+    elif state == "DO_BUILD":
+        t.do_build(toolchains_paths, nthreads)
+        state = "DO_COPYFILES"
 
     elif state == "DO_COPYFILES":
         utils.print_message(utils.logtype.INFO,

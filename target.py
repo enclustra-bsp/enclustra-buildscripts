@@ -939,7 +939,7 @@ class Target:
         return self.toolchains
 
     def call_build_tool(self, command, target, nthreads):
-        call = command
+        call = command.replace("${OUTDIR}", self.out_dir)
         if nthreads != 0:
             call += " -j" + str(nthreads)
         try:
@@ -1329,6 +1329,7 @@ class Target:
                         self.utils.print_message(self.utils.logtype.WARNING,
                                                  "Error while deleting file",
                                                  file_path, ":", str(exc))
+    def do_copybinaries(self):
 
         # there are some binaries
         if bool(self.binaries) and not self.fetch_only_run():
@@ -1352,7 +1353,10 @@ class Target:
                         src = self.binaries[binary]["path"] + "/" + outfile[1]
                     dst = self.out_dir + "/" + outfile[0]
                     try:
-                        shutil.copyfile(src, dst)
+                        if os.path.isfile(src):
+                            shutil.copyfile(src, dst)
+                        if os.path.isdir(src):
+                            shutil.copytree(src, dst)
                         self.utils.print_message(self.utils.logtype.INFO,
                                                  "Copying ./" +
                                                  os.path.relpath(src) +
