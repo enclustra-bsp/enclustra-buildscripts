@@ -800,7 +800,7 @@ while done is False:
                                                      initial_path)
         if code == "ok":
             # check if selected file is valid
-            if os.path.isfile(binary_path):
+            if os.path.isfile(binary_path) or os.path.isdir(binary_path):
                 # update copy file in binaries set
                 # and return to custom files menu
                 t.set_binaries_copyfile(selected_file, binary_path)
