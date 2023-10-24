@@ -1053,7 +1053,7 @@ class Target:
 
             # create device-tree only if files and path are specified for this target
             if device_tree and dt_path:
-		    
+
                 # create dts file, it contains includes for all the required dtsi files
                 dtb = open(self.master_repo_path + "/" + self.targets[target]["repository"] + "/" +
 			   dt_path + "/enclustra_generated.dts", "w")
@@ -1066,11 +1066,12 @@ class Target:
                 dts_file_containing_version_identifier = ""
                 for dt in device_tree:
                     full_file_path = self.master_repo_path + "/" + self.targets[target]["repository"] + "/" + dt_path + "/" + dt
-                    if self.string_exists_in_file("/dts-v1/;", full_file_path):
-                        dtb.write("#include \"" + dt + "\"\n")
-                        dts_file_containing_version_identifier = dt
-                        insert_version_identifier = False
-                        break
+                    if os.path.isfile(full_file_path):
+                        if self.string_exists_in_file("/dts-v1/;", full_file_path):
+                            dtb.write("#include \"" + dt + "\"\n")
+                            dts_file_containing_version_identifier = dt
+                            insert_version_identifier = False
+                            break
 
                 # remove dts from list to make sure it does not get added a second time
                 if dts_file_containing_version_identifier:
