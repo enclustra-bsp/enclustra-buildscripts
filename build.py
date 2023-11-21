@@ -167,8 +167,8 @@ parser.add_argument("--expert-mode", action='store_true',
                     ' the whole system manually')
 
 parser.add_argument("-o", "--dev-option", action='store', required=False,
-                    dest='device_option', metavar='index',
-                    help='set device option by index, the default one will'
+                    dest='device_option', metavar='name',
+                    help='set device option by name, the default one will'
                     ' be used if not specified')
 
 parser.add_argument("--generate-project", action='store_true', required=False,
