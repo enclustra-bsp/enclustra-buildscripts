@@ -554,7 +554,7 @@ elif args.device is not None:
     # overwrite chosen binary set to use custom files
     if args.custom_copyfiles:
         for cf in args.custom_copyfiles:
-            if os.path.isfile(str(cf[1])):
+            if os.path.isfile(str(cf[1])) or os.path.isdir(str(cf[1])):
                 if not t.set_binaries_copyfile(cf[0], cf[1]):
                     print("Setting binary component "+cf[0]+" failed.\n"
                           "Use --list-dev-binaries option to list valid"
