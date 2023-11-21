@@ -535,18 +535,18 @@ elif args.device is not None:
 
     if args.device_option is not None:
         binaries = t.get_marked_binaries()
-        index = int(args.device_option)
-        if index < 1:
+        device_option_is_valid = False
+
+        for binary in binaries:
+            if binary["description"] == args.device_option:
+                device_option_is_valid = True
+                break
+
+        if not device_option_is_valid:
             utils.print_message(utils.logtype.ERROR,
                                 "Invalid device option.")
             sys.exit(1)
-        elif index > len(binaries):
-            utils.print_message(utils.logtype.ERROR,
-                                "Chosen option exceeds available option",
-                                "count:", len(binaries))
-            sys.exit(1)
-        chosen_bin = binaries[index-1]
-        t.set_binaries(chosen_bin["description"])
+        t.set_binaries(args.device_option)
     else:
         # set the default one
         t.set_binaries(t.get_default_binary())
