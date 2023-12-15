@@ -1384,6 +1384,8 @@ class Target:
                         if os.path.isfile(src):
                             shutil.copyfile(src, dst)
                         if os.path.isdir(src):
+                            if os.path.isdir(dst):
+                                shutil.rmtree(dst)
                             shutil.copytree(src, dst)
                         self.utils.print_message(self.utils.logtype.INFO,
                                                  "Copying ./" +
